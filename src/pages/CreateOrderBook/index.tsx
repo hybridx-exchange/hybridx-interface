@@ -1,5 +1,5 @@
 import { TransactionResponse } from '@ethersproject/providers'
-import { Currency, Token } from '@hybridx-exchange/uniswap-sdk'
+import { Currency, Token } from '@hybridx-exchange/hybridx-sdk'
 import React, { useCallback, useEffect, useState } from 'react'
 import ReactGA from 'react-ga'
 import { RouteComponentProps } from 'react-router-dom'
@@ -23,7 +23,7 @@ import { useDerivedOrderBookInfo, useOrderBookActionHandlers, useOrderBookState 
 
 import { useTransactionAdder } from '../../state/transactions/hooks'
 import { StyledInternalLink, TYPE } from '../../theme'
-import { calculateGasMargin, getHybridRouterContract, getOrderBookFactoryContract } from '../../utils'
+import { calculateGasMargin, getOrderBookRouterContract, getOrderBookFactoryContract } from '../../utils'
 import { wrappedCurrency } from '../../utils/wrappedCurrency'
 import AppBody from '../AppBody'
 import { Wrapper } from '../Pool/styleds'
@@ -159,7 +159,7 @@ export default function CreateOrderBook({
     }
     if (!chainId || !library || !account) return
 
-    const hybridRouterContract = getHybridRouterContract(chainId, library, account)
+    const hybridRouterContract = getOrderBookRouterContract(chainId, library, account)
     const priceStep = orderBook?.priceStep
     const minAmount = orderBook?.minAmount
     if (

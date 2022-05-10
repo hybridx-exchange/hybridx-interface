@@ -1,8 +1,8 @@
 import { MaxUint256 } from '@ethersproject/constants'
 import { TransactionResponse } from '@ethersproject/providers'
-import { Swap, TokenAmount, CurrencyAmount, ETHER } from '@hybridx-exchange/uniswap-sdk'
+import { Swap, TokenAmount, CurrencyAmount, ETHER } from '@hybridx-exchange/hybridx-sdk'
 import { useCallback, useMemo } from 'react'
-import { ROUTER_ADDRESS } from '../constants'
+import { PAIR_ROUTER_ADDRESS } from '../constants'
 import { useTokenAllowance } from '../data/Allowances'
 import { Field } from '../state/swap/actions'
 import { useTransactionAdder, useHasPendingApproval } from '../state/transactions/hooks'
@@ -103,5 +103,5 @@ export function useApproveCallbackFromSwap(swap?: Swap, allowedSlippage = 0) {
     () => (swap ? computeSlippageAdjustedAmounts(swap, allowedSlippage)[Field.INPUT] : undefined),
     [swap, allowedSlippage]
   )
-  return useApproveCallback(amountToApprove, ROUTER_ADDRESS)
+  return useApproveCallback(amountToApprove, PAIR_ROUTER_ADDRESS)
 }

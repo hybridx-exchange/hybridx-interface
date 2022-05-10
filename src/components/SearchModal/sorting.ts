@@ -1,4 +1,4 @@
-import { Token, TokenAmount } from '@hybridx-exchange/uniswap-sdk'
+import { Token, TokenAmount } from '@hybridx-exchange/hybridx-sdk'
 import { useMemo } from 'react'
 import { useAllTokenBalances } from '../../state/wallet/hooks'
 

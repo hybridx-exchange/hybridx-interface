@@ -1,4 +1,4 @@
-import { Trade } from '@hybridx-exchange/uniswap-sdk'
+import { Trade } from '@hybridx-exchange/hybridx-sdk'
 import React, { useContext } from 'react'
 import { ThemeContext } from 'styled-components'
 import { TYPE } from '../../theme'

@@ -1,4 +1,4 @@
-import { ChainId } from '@hybridx-exchange/uniswap-sdk'
+import { ChainId } from '@hybridx-exchange/hybridx-sdk'
 import React from 'react'
 import { isMobile } from 'react-device-detect'
 import { Text } from 'rebass'

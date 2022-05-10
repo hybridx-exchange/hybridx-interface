@@ -1,4 +1,4 @@
-import { BigintIsh, Currency, CurrencyAmount, Price } from '@hybridx-exchange/uniswap-sdk'
+import { BigintIsh, Currency, CurrencyAmount, Price } from '@hybridx-exchange/hybridx-sdk'
 import React from 'react'
 import { Text } from 'rebass'
 import { ButtonPrimary } from '../../components/Button'

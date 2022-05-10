@@ -11,7 +11,7 @@ import {
   Trade,
   TradeType,
   ZERO
-} from '@hybridx-exchange/uniswap-sdk'
+} from '@hybridx-exchange/hybridx-sdk'
 import { ParsedQs } from 'qs'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'

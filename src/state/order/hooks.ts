@@ -1,4 +1,4 @@
-import { Currency, UserOrder } from '@hybridx-exchange/uniswap-sdk'
+import { Currency, UserOrder } from '@hybridx-exchange/hybridx-sdk'
 
 import { useActiveWeb3React } from '../../hooks'
 import { wrappedCurrency } from '../../utils/wrappedCurrency'

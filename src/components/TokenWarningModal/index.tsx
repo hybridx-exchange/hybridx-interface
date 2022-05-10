@@ -1,4 +1,4 @@
-import { Token } from '@hybridx-exchange/uniswap-sdk'
+import { Token } from '@hybridx-exchange/hybridx-sdk'
 import { transparentize } from 'polished'
 import React, { useCallback, useMemo, useState } from 'react'
 import styled from 'styled-components'

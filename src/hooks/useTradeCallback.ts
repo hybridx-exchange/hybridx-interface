@@ -1,10 +1,10 @@
 import { BigNumber } from '@ethersproject/bignumber'
 import { Contract } from '@ethersproject/contracts'
-import { TradeParameters, Trade, TradeType, Trader } from '@hybridx-exchange/uniswap-sdk'
+import { TradeParameters, Trade, TradeType, Trader } from '@hybridx-exchange/hybridx-sdk'
 import { useMemo } from 'react'
 import { DEFAULT_DEADLINE_FROM_NOW } from '../constants'
 import { useTransactionAdder } from '../state/transactions/hooks'
-import { calculateGasMargin, getHybridRouterContract, isAddress, shortenAddress } from '../utils'
+import { calculateGasMargin, getOrderBookRouterContract, isAddress, shortenAddress } from '../utils'
 import isZero from '../utils/isZero'
 import { useActiveWeb3React } from './index'
 import useENS from './useENS'
@@ -52,7 +52,7 @@ function useTradeCallArguments(
   return useMemo(() => {
     if (!trade || !recipient || !library || !account || !chainId) return []
 
-    const contract: Contract | null = getHybridRouterContract(chainId, library, account)
+    const contract: Contract | null = getOrderBookRouterContract(chainId, library, account)
     if (!contract) {
       return []
     }

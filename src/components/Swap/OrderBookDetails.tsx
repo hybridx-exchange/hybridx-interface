@@ -1,4 +1,4 @@
-import { Token, OrderBook, Currency, parseBigintIsh } from '@hybridx-exchange/uniswap-sdk'
+import { Token, OrderBook, Currency, parseBigintIsh } from '@hybridx-exchange/hybridx-sdk'
 import React, { useContext } from 'react'
 import { AutoColumn } from '../Column'
 import { Field } from '../../state/trade/actions'

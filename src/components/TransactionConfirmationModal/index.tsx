@@ -1,4 +1,4 @@
-import { ChainId } from '@hybridx-exchange/uniswap-sdk'
+import { ChainId } from '@hybridx-exchange/hybridx-sdk'
 import React, { useContext } from 'react'
 import styled, { ThemeContext } from 'styled-components'
 import Modal from '../Modal'

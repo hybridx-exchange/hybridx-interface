@@ -1,4 +1,4 @@
-import { Currency, ETHER, JSBI, TokenAmount } from '@hybridx-exchange/uniswap-sdk'
+import { Currency, ETHER, JSBI, TokenAmount } from '@hybridx-exchange/hybridx-sdk'
 import React, { useCallback, useEffect, useState } from 'react'
 import { Plus } from 'react-feather'
 import { Text } from 'rebass'

@@ -14,7 +14,7 @@ import {
   TradeType,
   UserOrder,
   ZERO
-} from '@hybridx-exchange/uniswap-sdk'
+} from '@hybridx-exchange/hybridx-sdk'
 import flatMap from 'lodash.flatmap'
 import { useMemo } from 'react'
 
@@ -22,8 +22,8 @@ import {
   BASES_TO_CHECK_TRADES_AGAINST,
   CUSTOM_BASES,
   DEFAULT_LIMIT_SIZE,
-  HYBRIDX_ROUTER_ADDRESS,
-  ROUTER_ADDRESS,
+  ORDER_BOOK_ROUTER_ADDRESS,
+  PAIR_UTILS_ADDRESS,
   ZERO_ADDRESS
 } from '../constants'
 import { PairState, usePairs } from '../data/Reserves'
@@ -31,11 +31,11 @@ import { wrappedCurrency, wrappedCurrencyAmount } from '../utils/wrappedCurrency
 
 import { useActiveWeb3React } from './index'
 import { useMultipleContractMultipleData, useMultipleContractSingleData } from '../state/multicall/hooks'
-import { abi as IUniswapV2Router02ABI } from '@hybridx-exchange/v2-periphery/build/IUniswapV2Router02.json'
-import { abi as IHybridRouterABI } from '@hybridx-exchange/orderbook-periphery/build/IHybridRouter.json'
-import { abi as IOrderBookABI } from '@hybridx-exchange/orderbook-core/build/IOrderBook.json'
+import { abi as IUniswapV2Router02ABI } from '@hybridx-exchange/hybridx-protocol/build/IPairRouter.json'
+import { abi as IHybridRouterABI } from '@hybridx-exchange/hybridx-protocol/build/IOrderBookRouter.json'
+import { abi as IOrderBookABI } from '@hybridx-exchange/hybridx-protocol/build/IOrderBook.json'
 import { Interface } from '@ethersproject/abi'
-import {useUserSingleHopOnly} from "../state/user/hooks";
+import { useUserSingleHopOnly } from '../state/user/hooks'
 
 function useAllCommonPairs(currencyA?: Currency, currencyB?: Currency): Pair[] {
   const { chainId } = useActiveWeb3React()
@@ -128,7 +128,7 @@ export function useGetBestOutputAmount(
 
   const paths2 = paths ? Array.prototype.concat.apply([], paths) : undefined
   const results = useMultipleContractSingleData(
-    [ROUTER_ADDRESS],
+    [PAIR_UTILS_ADDRESS],
     new Interface(IUniswapV2Router02ABI),
     'getBestAmountsOut',
     [currencyAmountIn?.raw.toString(), paths2, lens]
@@ -200,7 +200,7 @@ export function useGetBestInputAmount(
 
   const paths2 = paths ? Array.prototype.concat.apply([], paths) : undefined
   const results = useMultipleContractSingleData(
-    [ROUTER_ADDRESS],
+    [PAIR_UTILS_ADDRESS],
     new Interface(IUniswapV2Router02ABI),
     'getBestAmountsIn',
     [currencyAmountOut?.raw.toString(), paths2, lens]
@@ -298,7 +298,7 @@ export function useOrderBook(currencyIn?: Currency | undefined, currencyOut?: Cu
   const orderBookInterface = new Interface(IOrderBookABI)
   const results = useMultipleContractMultipleData(
     [
-      tokenIn && tokenOut && tokenIn.address !== tokenOut.address ? HYBRIDX_ROUTER_ADDRESS : '',
+      tokenIn && tokenOut && tokenIn.address !== tokenOut.address ? ORDER_BOOK_ROUTER_ADDRESS : '',
       orderBookAddress,
       orderBookAddress,
       orderBookAddress,
@@ -421,7 +421,7 @@ export function useTradeRet(
   const tokenIn = type === TradeType.LIMIT_BUY ? orderBook?.quoteToken : orderBook?.baseToken
   const tokenOut = type === TradeType.LIMIT_BUY ? orderBook?.baseToken : orderBook?.quoteToken
   const results = useMultipleContractMultipleData(
-    [orderBook && amount && price && type ? HYBRIDX_ROUTER_ADDRESS : ''],
+    [orderBook && amount && price && type ? ORDER_BOOK_ROUTER_ADDRESS : ''],
     [new Interface(IHybridRouterABI)],
     [type === TradeType.LIMIT_BUY ? 'getAmountsForBuy' : 'getAmountsForSell'],
     [
@@ -570,7 +570,7 @@ export function useUserOrders(selectOrderBooks: (Token | string)[][], userOrderI
     for (let i = 0; i < userOrderIds.length; i++) {
       const order = returns[i].data ?? []
       if (order.length === 0) continue
-      const [owner, to, orderId, price, amountOffer, amountRemain, orderType, orderIndex] = order[0]
+      const [owner, orderId, price, amountOffer, amountRemain, orderType, orderIndex] = order[0]
       //console.log('order:', owner, to, orderId, price, amountOffer, amountRemain, orderType, orderIndex)
       const quoteAddress = returns[userOrderIds.length + i].data?.toString()
       //console.log('quote:', quoteAddress)
@@ -600,7 +600,6 @@ export function useUserOrders(selectOrderBooks: (Token | string)[][], userOrderI
         orderType: type,
         owner: '0x' + JSBI.BigInt(owner).toString(16),
         price: priceAmount,
-        to: '0x' + JSBI.BigInt(to).toString(16),
         orderBook: orderBookAddresses[i],
         baseToken: baseToken,
         quoteToken: quoteToken

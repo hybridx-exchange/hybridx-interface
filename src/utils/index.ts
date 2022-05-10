@@ -3,11 +3,11 @@ import { getAddress } from '@ethersproject/address'
 import { AddressZero } from '@ethersproject/constants'
 import { JsonRpcSigner, Web3Provider } from '@ethersproject/providers'
 import { BigNumber } from '@ethersproject/bignumber'
-import { abi as IUniswapV2Router02ABI } from '@hybridx-exchange/v2-periphery/build/IUniswapV2Router02.json'
-import { abi as IOrderBookFactoryABI } from '@hybridx-exchange/orderbook-core/build/IOrderBookFactory.json'
-import { abi as IHybridRouterABI } from '@hybridx-exchange/orderbook-periphery/build/IHybridRouter.json'
-import { HYBRIDX_ROUTER_ADDRESS, ROUTER_ADDRESS } from '../constants'
-import { abi as IOrderBookABI } from '@hybridx-exchange/orderbook-core/build/IOrderBook.json'
+import { abi as IPairRouterABI } from '@hybridx-exchange/hybridx-protocol/build/IPairRouter.json'
+import { abi as IOrderBookFactoryABI } from '@hybridx-exchange/hybridx-protocol/build/IOrderBookFactory.json'
+import { abi as IOrderBookRouterABI } from '@hybridx-exchange/hybridx-protocol/build/IOrderBookRouter.json'
+import { ORDER_BOOK_ROUTER_ADDRESS, PAIR_ROUTER_ADDRESS } from '../constants'
+import { abi as IOrderBookABI } from '@hybridx-exchange/hybridx-protocol/build/IOrderBook.json'
 import {
   ChainId,
   JSBI,
@@ -17,7 +17,7 @@ import {
   Currency,
   ETHER,
   ORDER_BOOK_FACTORY_ADDRESS
-} from '@hybridx-exchange/uniswap-sdk'
+} from '@hybridx-exchange/hybridx-sdk'
 import { TokenAddressMap } from '../state/lists/hooks'
 import { injected } from '../connectors'
 
@@ -101,8 +101,8 @@ export function getContract(address: string, ABI: any, library: Web3Provider, ac
 }
 
 // account is optional
-export function getRouterContract(_: number, library: Web3Provider, account?: string): Contract {
-  return getContract(ROUTER_ADDRESS, IUniswapV2Router02ABI, library, account)
+export function getPairRouterContract(_: number, library: Web3Provider, account?: string): Contract {
+  return getContract(PAIR_ROUTER_ADDRESS, IPairRouterABI, library, account)
 }
 
 // account is optional
@@ -111,8 +111,8 @@ export function getOrderBookFactoryContract(_: number, library: Web3Provider, ac
 }
 
 // account is optional
-export function getHybridRouterContract(_: number, library: Web3Provider, account?: string): Contract {
-  return getContract(HYBRIDX_ROUTER_ADDRESS, IHybridRouterABI, library, account)
+export function getOrderBookRouterContract(_: number, library: Web3Provider, account?: string): Contract {
+  return getContract(ORDER_BOOK_ROUTER_ADDRESS, IOrderBookRouterABI, library, account)
 }
 
 export function escapeRegExp(string: string): string {

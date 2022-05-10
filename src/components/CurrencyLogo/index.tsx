@@ -1,4 +1,4 @@
-import { Currency, ETHER, Token } from '@hybridx-exchange/uniswap-sdk'
+import { Currency, ETHER, Token } from '@hybridx-exchange/hybridx-sdk'
 import React, { useMemo } from 'react'
 import styled from 'styled-components'
 

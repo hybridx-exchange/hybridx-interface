@@ -1,4 +1,4 @@
-import { ChainId, Token } from '@hybridx-exchange/uniswap-sdk'
+import { ChainId, Token } from '@hybridx-exchange/hybridx-sdk'
 import { Tags, TokenInfo, TokenList } from '@uniswap/token-lists'
 import { useMemo } from 'react'
 import { useSelector } from 'react-redux'

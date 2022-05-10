@@ -1,4 +1,4 @@
-import { Currency } from '@hybridx-exchange/uniswap-sdk'
+import { Currency } from '@hybridx-exchange/hybridx-sdk'
 import React, { useCallback, useEffect, useState } from 'react'
 import ReactGA from 'react-ga'
 import useLast from '../../hooks/useLast'

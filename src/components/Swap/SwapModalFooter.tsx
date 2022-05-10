@@ -1,4 +1,4 @@
-import { Swap, SwapType } from '@hybridx-exchange/uniswap-sdk'
+import { Swap, SwapType } from '@hybridx-exchange/hybridx-sdk'
 import React, { useContext, useMemo, useState } from 'react'
 import { Repeat } from 'react-feather'
 import { Text } from 'rebass'

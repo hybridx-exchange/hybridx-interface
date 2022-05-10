@@ -1,4 +1,4 @@
-import { Currency, ETHER, Token } from '@hybridx-exchange/uniswap-sdk'
+import { Currency, ETHER, Token } from '@hybridx-exchange/hybridx-sdk'
 
 export function currencyId(currency: Currency): string {
   if (currency === ETHER) return 'ROSE'

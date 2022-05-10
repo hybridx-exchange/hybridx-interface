@@ -9,7 +9,7 @@ import {
   Trade,
   TradeType,
   ZERO
-} from '@hybridx-exchange/uniswap-sdk'
+} from '@hybridx-exchange/hybridx-sdk'
 import React, { useCallback, useContext, useEffect, useState } from 'react'
 import { ArrowDown } from 'react-feather'
 import ReactGA from 'react-ga'
@@ -26,7 +26,7 @@ import { AutoRow, RowBetween } from '../../components/Row'
 import { ArrowWrapper, BottomGrouping, SwapCallbackError, Wrapper } from '../../components/Swap/styleds'
 import ProgressSteps from '../../components/ProgressSteps'
 
-import { HYBRIDX_ROUTER_ADDRESS } from '../../constants'
+import { ORDER_BOOK_ROUTER_ADDRESS } from '../../constants'
 import { useActiveWeb3React } from '../../hooks'
 import { useCurrency } from '../../hooks/Tokens'
 import { ApprovalState, useApproveCallback } from '../../hooks/useApproveCallback'
@@ -166,7 +166,7 @@ export default function DoTrade({
   )
 
   // check whether the user has approved the router on the input token
-  const [approval, approveCallback] = useApproveCallback(parsedAmountAmount, HYBRIDX_ROUTER_ADDRESS)
+  const [approval, approveCallback] = useApproveCallback(parsedAmountAmount, ORDER_BOOK_ROUTER_ADDRESS)
 
   // check if user has gone through approval process, used to show two step buttons, reset on token change
   const [approvalSubmitted, setApprovalSubmitted] = useState<boolean>(false)

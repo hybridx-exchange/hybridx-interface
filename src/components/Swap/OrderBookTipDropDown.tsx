@@ -6,7 +6,7 @@ import { Field } from '../../state/trade/actions'
 import { Text } from 'rebass'
 import { StyledInternalLink } from '../../theme'
 import { AutoColumn } from '../Column'
-import { Token } from '@hybridx-exchange/uniswap-sdk'
+import { Token } from '@hybridx-exchange/hybridx-sdk'
 import { useExpertModeManager } from '../../state/user/hooks'
 
 const OrderBookDetailsFooter = styled.div<{ show: boolean }>`

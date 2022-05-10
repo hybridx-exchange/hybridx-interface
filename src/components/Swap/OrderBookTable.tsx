@@ -1,4 +1,4 @@
-import {Currency, OrderBook, Token, TradeType} from '@hybridx-exchange/uniswap-sdk'
+import {Currency, OrderBook, Token, TradeType} from '@hybridx-exchange/hybridx-sdk'
 import React, { useContext } from 'react'
 import styled, { ThemeContext } from 'styled-components'
 import { RowBetween, RowFixed } from '../Row'

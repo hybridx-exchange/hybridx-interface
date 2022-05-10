@@ -1,10 +1,10 @@
 import { BigNumber } from '@ethersproject/bignumber'
 import { Contract } from '@ethersproject/contracts'
-import { JSBI, Percent, Router, SwapParameters, Swap, SwapType } from '@hybridx-exchange/uniswap-sdk'
+import { JSBI, Percent, Router, SwapParameters, Swap, SwapType } from '@hybridx-exchange/hybridx-sdk'
 import { useMemo } from 'react'
 import { BIPS_BASE, DEFAULT_DEADLINE_FROM_NOW, INITIAL_ALLOWED_SLIPPAGE } from '../constants'
 import { useTransactionAdder } from '../state/transactions/hooks'
-import { calculateGasMargin, getRouterContract, isAddress, shortenAddress } from '../utils'
+import { calculateGasMargin, getPairRouterContract, isAddress, shortenAddress } from '../utils'
 import isZero from '../utils/isZero'
 import { useActiveWeb3React } from './index'
 import useENS from './useENS'
@@ -55,7 +55,7 @@ function useSwapCallArguments(
     const tradeVersion = Version.v2
     if (!swap || !recipient || !library || !account || !tradeVersion || !chainId) return []
 
-    const contract: Contract | null = getRouterContract(chainId, library, account)
+    const contract: Contract | null = getPairRouterContract(chainId, library, account)
     if (!contract) {
       return []
     }

@@ -1,4 +1,4 @@
-import { Swap, SwapType } from '@hybridx-exchange/uniswap-sdk'
+import { Swap, SwapType } from '@hybridx-exchange/hybridx-sdk'
 import React, { useContext } from 'react'
 import { ThemeContext } from 'styled-components'
 import { Field } from '../../state/swap/actions'

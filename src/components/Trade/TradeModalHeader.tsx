@@ -1,4 +1,4 @@
-import { Trade, TradeType } from '@hybridx-exchange/uniswap-sdk'
+import { Trade, TradeType } from '@hybridx-exchange/hybridx-sdk'
 import React, { useContext } from 'react'
 import { AlertTriangle } from 'react-feather'
 import { ThemeContext } from 'styled-components'

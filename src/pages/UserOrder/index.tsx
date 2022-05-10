@@ -1,6 +1,6 @@
 import React, { useCallback, useContext, useMemo, useState } from 'react'
 import styled, { ThemeContext } from 'styled-components'
-import { Currency, ETHER, OrderBook } from '@hybridx-exchange/uniswap-sdk'
+import { Currency, ETHER, OrderBook } from '@hybridx-exchange/hybridx-sdk'
 import { SwapPoolTabs } from '../../components/NavigationTabs'
 
 import Question from '../../components/QuestionHelper'

@@ -1,4 +1,4 @@
-import { ChainId } from '@hybridx-exchange/uniswap-sdk'
+import { ChainId } from '@hybridx-exchange/hybridx-sdk'
 import MULTICALL_ABI from './abi.json'
 
 const MULTICALL_NETWORKS: { [chainId in ChainId]: string } = {

@@ -1,9 +1,10 @@
 import { Contract } from '@ethersproject/contracts'
-import { ChainId, WETH } from '@hybridx-exchange/uniswap-sdk'
-import { abi as IUniswapV2PairABI } from '@hybridx-exchange/v2-core/build/IUniswapV2Pair.json'
-import { abi as IOrderBookABI } from '@hybridx-exchange/orderbook-core/build/IOrderBook.json'
-import { abi as IOrderBookFactoryABI } from '@hybridx-exchange/orderbook-core/build/IOrderBookFactory.json'
-import { abi as IHybridRouterABI } from '@hybridx-exchange/orderbook-periphery/build/IHybridRouter.json'
+import { ChainId, WETH } from '@hybridx-exchange/hybridx-sdk'
+import { abi as IPairABI } from '@hybridx-exchange/hybridx-protocol/build/IPair.json'
+import { abi as IOrderBookABI } from '@hybridx-exchange/hybridx-protocol/build/IOrderBook.json'
+import { abi as IOrderBookFactoryABI } from '@hybridx-exchange/hybridx-protocol/build/IOrderBookFactory.json'
+import { abi as IOrderBookRouterABI } from '@hybridx-exchange/hybridx-protocol/build/IOrderBookRouter.json'
+import { abi as IPairRouterABI } from '@hybridx-exchange/hybridx-protocol/build/IPairRouter.json'
 import { useMemo } from 'react'
 import ENS_ABI from '../constants/abis/ens-registrar.json'
 import ENS_PUBLIC_RESOLVER_ABI from '../constants/abis/ens-public-resolver.json'
@@ -12,11 +13,10 @@ import ERC20_ABI from '../constants/abis/erc20.json'
 import UNISOCKS_ABI from '../constants/abis/unisocks.json'
 import WETH_ABI from '../constants/abis/weth.json'
 import { MULTICALL_ABI, MULTICALL_NETWORKS } from '../constants/multicall'
-import { abi as IUniswapV2Router02ABI } from '@hybridx-exchange/v2-periphery/build/IUniswapV2Router02.json'
 import { getContract } from '../utils'
 import { useActiveWeb3React } from './index'
-import { ORDER_BOOK_FACTORY_ADDRESS } from '@hybridx-exchange/uniswap-sdk'
-import { HYBRIDX_ROUTER_ADDRESS } from '../constants'
+import { ORDER_BOOK_FACTORY_ADDRESS } from '@hybridx-exchange/hybridx-sdk'
+import { ORDER_BOOK_ROUTER_ADDRESS } from '../constants'
 
 // returns null on errors
 function useContract(address: string | undefined, ABI: any, withSignerIfPossible = true): Contract | null {
@@ -65,11 +65,11 @@ export function useBytes32TokenContract(tokenAddress?: string, withSignerIfPossi
 }
 
 export function usePairContract(pairAddress?: string, withSignerIfPossible?: boolean): Contract | null {
-  return useContract(pairAddress, IUniswapV2PairABI, withSignerIfPossible)
+  return useContract(pairAddress, IPairABI, withSignerIfPossible)
 }
 
-export function useRouterContract(routerAddress?: string, withSignerIfPossible?: boolean): Contract | null {
-  return useContract(routerAddress, IUniswapV2Router02ABI, withSignerIfPossible)
+export function usePairRouterContract(routerAddress?: string, withSignerIfPossible?: boolean): Contract | null {
+  return useContract(routerAddress, IPairRouterABI, withSignerIfPossible)
 }
 
 export function useOrderBookContract(orderBookAddress?: string, withSignerIfPossible?: boolean): Contract | null {
@@ -80,8 +80,8 @@ export function useOrderBookFactoryContract(withSignerIfPossible?: boolean): Con
   return useContract(ORDER_BOOK_FACTORY_ADDRESS, IOrderBookFactoryABI, withSignerIfPossible)
 }
 
-export function useHybridxRouterContract(withSignerIfPossible?: boolean): Contract | null {
-  return useContract(HYBRIDX_ROUTER_ADDRESS, IHybridRouterABI, withSignerIfPossible)
+export function useOrderBookRouterContract(withSignerIfPossible?: boolean): Contract | null {
+  return useContract(ORDER_BOOK_ROUTER_ADDRESS, IOrderBookRouterABI, withSignerIfPossible)
 }
 
 export function useMulticallContract(): Contract | null {

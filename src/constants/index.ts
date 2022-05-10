@@ -1,11 +1,12 @@
-import { ChainId, JSBI, Percent, Token, WETH } from '@hybridx-exchange/uniswap-sdk'
+import { ChainId, JSBI, Percent, Token, WETH } from '@hybridx-exchange/hybridx-sdk'
 import { AbstractConnector } from '@web3-react/abstract-connector'
 
 //import { fortmatic, injected, portis, walletconnect, walletlink } from '../connectors'
 import { injected /*, walletconnect*/ } from '../connectors'
 
-export const ROUTER_ADDRESS = '0x8C4181aD3f2037b3D40AbD38826A3B38ac2aCACc'
-export const HYBRIDX_ROUTER_ADDRESS = '0x00640bc770A3a023a1fd20C26f1672fc99214737'
+export const PAIR_ROUTER_ADDRESS = '0x1F27E95EA86F4F9Bf573792FC86b6AfD26b90D98'
+export const PAIR_UTILS_ADDRESS = '0x1BfF64408d1BD6d9fb0988Ee41EacB4f185F9781'
+export const ORDER_BOOK_ROUTER_ADDRESS = '0xF92AFdc3727121980771b904Af3E0fc8b5518fB5'
 export const DEFAULT_LIMIT_SIZE = 8
 export const ZERO_ADDRESS = '0x0000000000000000000000000000000000000000'
 
@@ -15,7 +16,6 @@ type ChainTokenList = {
 }
 
 export const USDC = new Token(ChainId.MAINNET, '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48', 6, 'USDC', 'USD//C')
-export const DAI = new Token(ChainId.MAINNET, '0x6b175474e89094c44da98b954eedeac495271d0f', 18, 'DAI', 'Dai Stablecoin')
 
 const WETH_ONLY: ChainTokenList = {
   [ChainId.MAINNET]: [WETH[ChainId.MAINNET]],

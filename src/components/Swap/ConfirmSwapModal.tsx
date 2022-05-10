@@ -1,4 +1,4 @@
-import { currencyEquals, Swap } from '@hybridx-exchange/uniswap-sdk'
+import { currencyEquals, Swap } from '@hybridx-exchange/hybridx-sdk'
 import React, { useCallback, useMemo } from 'react'
 import TransactionConfirmationModal, {
   ConfirmationModalContent,

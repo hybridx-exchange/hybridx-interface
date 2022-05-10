@@ -1,13 +1,13 @@
-import { TokenAmount, Pair, Currency } from '@hybridx-exchange/uniswap-sdk'
+import { TokenAmount, Pair, Currency } from '@hybridx-exchange/hybridx-sdk'
 import { useMemo } from 'react'
-import { abi as IUniswapV2PairABI } from '@hybridx-exchange/v2-core/build/IUniswapV2Pair.json'
+import { abi as IPairABI } from '@hybridx-exchange/hybridx-protocol/build/IPair.json'
 import { Interface } from '@ethersproject/abi'
 import { useActiveWeb3React } from '../hooks'
 
 import { useMultipleContractSingleData } from '../state/multicall/hooks'
 import { wrappedCurrency } from '../utils/wrappedCurrency'
 
-const PAIR_INTERFACE = new Interface(IUniswapV2PairABI)
+const PAIR_INTERFACE = new Interface(IPairABI)
 
 export enum PairState {
   LOADING,

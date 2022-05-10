@@ -1,4 +1,4 @@
-import { Currency, Pair } from '@hybridx-exchange/uniswap-sdk'
+import { Currency, Pair } from '@hybridx-exchange/hybridx-sdk'
 import React, { useState, useContext, useCallback } from 'react'
 import styled, { ThemeContext } from 'styled-components'
 import { darken } from 'polished'

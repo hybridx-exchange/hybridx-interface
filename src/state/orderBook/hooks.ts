@@ -1,4 +1,4 @@
-import { Currency, CurrencyAmount, JSBI, OrderBook, Pair } from '@hybridx-exchange/uniswap-sdk'
+import { Currency, CurrencyAmount, JSBI, OrderBook, Pair } from '@hybridx-exchange/hybridx-sdk'
 import { useCallback, useMemo } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { PairState, usePair } from '../../data/Reserves'

@@ -1,5 +1,5 @@
 import { isAddress } from '../../utils'
-import { Token } from '@hybridx-exchange/uniswap-sdk'
+import { Token } from '@hybridx-exchange/hybridx-sdk'
 
 export function filterTokens(tokens: Token[], search: string): Token[] {
   if (search.length === 0) return tokens
