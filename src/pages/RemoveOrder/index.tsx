@@ -176,7 +176,7 @@ export default function RemoveOrder({
               </Text>
               <RowFixed>
                 <Text fontWeight={500} fontSize={12}>
-                  {userOrder?.to}
+                  {userOrder?.owner}
                 </Text>
               </RowFixed>
             </RowBetween>
@@ -193,7 +193,7 @@ export default function RemoveOrder({
 
   const pendingText = `Removing order ${userOrder?.orderId}, and ${userOrder?.amountLeft.toSignificant(6)} ${
     userOrder?.amountLeft.token.symbol
-  } will send to ${userOrder?.to} immediately`
+  } will send to ${userOrder?.owner} immediately`
 
   const handleDismissConfirmation = useCallback(() => {
     setShowConfirm(false)
@@ -246,7 +246,7 @@ export default function RemoveOrder({
                         Receiver
                       </Text>
                       <Text fontSize={12} fontWeight={500}>
-                        {userOrder?.to}
+                        {userOrder?.owner}
                       </Text>
                     </RowBetween>
                   </AutoColumn>
