@@ -13,7 +13,8 @@ import {
   TradeRet,
   TradeType,
   UserOrder,
-  ZERO
+  ZERO,
+  CONFIG_ADDRESS
 } from '@hybridx-exchange/hybridx-sdk'
 import flatMap from 'lodash.flatmap'
 import { useMemo } from 'react'
@@ -31,8 +32,9 @@ import { wrappedCurrency, wrappedCurrencyAmount } from '../utils/wrappedCurrency
 
 import { useActiveWeb3React } from './index'
 import { useMultipleContractMultipleData, useMultipleContractSingleData } from '../state/multicall/hooks'
-import { abi as IUniswapV2Router02ABI } from '@hybridx-exchange/hybridx-protocol/build/IPairRouter.json'
-import { abi as IHybridRouterABI } from '@hybridx-exchange/hybridx-protocol/build/IOrderBookRouter.json'
+import { abi as IPairUtilsABI } from '@hybridx-exchange/hybridx-protocol/build/IPairUtils.json'
+import { abi as IConfigABI } from '@hybridx-exchange/hybridx-protocol/build/IConfig.json'
+import { abi as IOrderBookRouterABI } from '@hybridx-exchange/hybridx-protocol/build/IOrderBookRouter.json'
 import { abi as IOrderBookABI } from '@hybridx-exchange/hybridx-protocol/build/IOrderBook.json'
 import { Interface } from '@ethersproject/abi'
 import { useUserSingleHopOnly } from '../state/user/hooks'
@@ -129,7 +131,7 @@ export function useGetBestOutputAmount(
   const paths2 = paths ? Array.prototype.concat.apply([], paths) : undefined
   const results = useMultipleContractSingleData(
     [PAIR_UTILS_ADDRESS],
-    new Interface(IUniswapV2Router02ABI),
+    new Interface(IPairUtilsABI),
     'getBestAmountsOut',
     [currencyAmountIn?.raw.toString(), paths2, lens]
   )
@@ -201,7 +203,7 @@ export function useGetBestInputAmount(
   const paths2 = paths ? Array.prototype.concat.apply([], paths) : undefined
   const results = useMultipleContractSingleData(
     [PAIR_UTILS_ADDRESS],
-    new Interface(IUniswapV2Router02ABI),
+    new Interface(IPairUtilsABI),
     'getBestAmountsIn',
     [currencyAmountOut?.raw.toString(), paths2, lens]
   )
@@ -296,36 +298,45 @@ export function useOrderBook(currencyIn?: Currency | undefined, currencyOut?: Cu
   const orderBookAddress =
     tokenIn && tokenOut && tokenIn.address !== tokenOut.address ? OrderBook.getAddress(tokenIn, tokenOut) : ''
   const orderBookInterface = new Interface(IOrderBookABI)
+  const configInterface = new Interface(IConfigABI)
   const results = useMultipleContractMultipleData(
     [
       tokenIn && tokenOut && tokenIn.address !== tokenOut.address ? ORDER_BOOK_ROUTER_ADDRESS : '',
       orderBookAddress,
       orderBookAddress,
-      orderBookAddress,
-      orderBookAddress,
-      orderBookAddress,
-      orderBookAddress
+      CONFIG_ADDRESS,
+      CONFIG_ADDRESS,
+      CONFIG_ADDRESS,
+      CONFIG_ADDRESS
     ],
     [
-      new Interface(IHybridRouterABI),
+      new Interface(IOrderBookRouterABI),
       orderBookInterface,
       orderBookInterface,
-      orderBookInterface,
-      orderBookInterface,
-      orderBookInterface,
-      orderBookInterface
+      configInterface,
+      configInterface,
+      configInterface,
+      configInterface
     ],
-    ['getOrderBook', 'getReserves', 'baseToken', 'protocolFeeRate', 'subsidyFeeRate', 'minAmount', 'priceStep'],
+    [
+      'getOrderBook',
+      'getReserves',
+      'baseToken',
+      'protocolFeeRate',
+      'subsidyFeeRate',
+      'priceStepFactor',
+      'priceStepMap'
+    ],
     [
       tokenIn && tokenOut
         ? [tokenIn.address, tokenOut.address, DEFAULT_LIMIT_SIZE]
         : [ZERO_ADDRESS, ZERO_ADDRESS, DEFAULT_LIMIT_SIZE],
       [],
       [],
+      [orderBookAddress === '' ? ZERO_ADDRESS : orderBookAddress],
+      [orderBookAddress === '' ? ZERO_ADDRESS : orderBookAddress],
       [],
-      [],
-      [],
-      []
+      [orderBookAddress === '' ? ZERO_ADDRESS : orderBookAddress]
     ]
   )
 
@@ -368,14 +379,23 @@ export function useOrderBook(currencyIn?: Currency | undefined, currencyOut?: Cu
       data: [subsidyFeeRate]
     } = returns[4]
     const {
-      data: [minAmount]
+      data: [priceStepFactor]
     } = returns[5]
     const {
       data: [priceStep]
     } = returns[6]
     const baseToken = baseTokenAddress.toLowerCase() === tokenIn?.address.toLowerCase() ? tokenIn : tokenOut
     const quoteToken = baseTokenAddress.toLowerCase() === tokenIn?.address.toLowerCase() ? tokenOut : tokenIn
-    if (baseToken && quoteToken && buyPrices && buyAmounts && sellPrices && sellAmounts && minAmount && priceStep) {
+    if (
+      baseToken &&
+      quoteToken &&
+      buyPrices &&
+      buyAmounts &&
+      sellPrices &&
+      sellAmounts &&
+      priceStepFactor &&
+      priceStep
+    ) {
       const baseAmount = wrappedCurrencyAmount(new TokenAmount(baseToken, baseReserve), baseToken.chainId)
       const quoteAmount = wrappedCurrencyAmount(new TokenAmount(quoteToken, quoteReserve), quoteToken.chainId)
       const curPrice = wrappedCurrencyAmount(new TokenAmount(quoteToken, price), quoteToken.chainId)
@@ -397,8 +417,8 @@ export function useOrderBook(currencyIn?: Currency | undefined, currencyOut?: Cu
         ? new OrderBook(
             baseAmount,
             quoteAmount,
-            minAmount,
             priceStep,
+            priceStepFactor,
             protocolFeeRate,
             subsidyFeeRate,
             curPrice,
@@ -422,7 +442,7 @@ export function useTradeRet(
   const tokenOut = type === TradeType.LIMIT_BUY ? orderBook?.baseToken : orderBook?.quoteToken
   const results = useMultipleContractMultipleData(
     [orderBook && amount && price && type ? ORDER_BOOK_ROUTER_ADDRESS : ''],
-    [new Interface(IHybridRouterABI)],
+    [new Interface(IOrderBookRouterABI)],
     [type === TradeType.LIMIT_BUY ? 'getAmountsForBuy' : 'getAmountsForSell'],
     [
       amount && price
