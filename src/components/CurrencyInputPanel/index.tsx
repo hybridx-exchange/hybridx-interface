@@ -148,6 +148,8 @@ interface CurrencyInputPanelProps {
   isOrderBook?: boolean
   hideCurrency?: boolean
   inputDisable?: boolean
+  enableReserveCurrency?: boolean
+  onCurrencyReserve?: () => void
 }
 
 export default function CurrencyInputPanel({
@@ -167,7 +169,9 @@ export default function CurrencyInputPanel({
   showCommonBases,
   isOrderBook,
   hideCurrency,
-  inputDisable
+  inputDisable,
+  enableReserveCurrency = false,
+  onCurrencyReserve
 }: CurrencyInputPanelProps) {
   const { t } = useTranslation()
 
@@ -191,15 +195,21 @@ export default function CurrencyInputPanel({
               </TYPE.body>
               {account && (
                 <TYPE.body
-                  onClick={onMax}
+                  onClick={onCurrencyReserve ? onCurrencyReserve : onMax}
                   color={theme.text2}
                   fontWeight={500}
                   fontSize={14}
                   style={{ display: 'inline', cursor: 'pointer' }}
                 >
-                  {!hideBalance && !!currency && selectedCurrencyBalance
-                    ? 'Balance: ' + selectedCurrencyBalance?.toSignificant(6)
-                    : ' -'}
+                  {!enableReserveCurrency &&
+                    (!hideBalance && !!currency && selectedCurrencyBalance
+                      ? 'Balance: ' + selectedCurrencyBalance?.toSignificant(6)
+                      : ' -')}
+                  {enableReserveCurrency && (
+                    <span role="img" aria-label="arrow" onClick={onCurrencyReserve}>
+                      🔁
+                    </span>
+                  )}
                 </TYPE.body>
               )}
             </RowBetween>

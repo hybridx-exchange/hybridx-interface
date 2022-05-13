@@ -21,9 +21,11 @@ import useParsedQueryString from '../../hooks/useParsedQueryString'
 import { isAddress } from '../../utils'
 import { AppDispatch, AppState } from '../index'
 import { useCurrencyBalances } from '../wallet/hooks'
-import { Field, Input, replaceTradeState, setRecipient, tradeTypeInput } from './actions'
+import { Field, Input, replaceTradeState, setRecipient, setSelectedType, tradeTypeInput } from './actions'
 import { TradeState } from './reducer'
 import { wrappedCurrency } from '../../utils/wrappedCurrency'
+import { PairState, usePair } from '../../data/Reserves'
+import { useTotalSupply } from '../../data/TotalSupply'
 
 export function useTradeState(): AppState['trade'] {
   return useSelector<AppState, AppState['trade']>(state => state.trade)
@@ -32,6 +34,7 @@ export function useTradeState(): AppState['trade'] {
 export function useTradeActionHandlers(): {
   onUserInput: (input: Input, typedValue: string) => void
   onChangeRecipient: (recipient: string | null) => void
+  onChangeSelectedType: (type: TradeType) => void
 } {
   const dispatch = useDispatch<AppDispatch>()
 
@@ -49,9 +52,17 @@ export function useTradeActionHandlers(): {
     [dispatch]
   )
 
+  const onChangeSelectedType = useCallback(
+    (type: TradeType) => {
+      dispatch(setSelectedType({ type }))
+    },
+    [dispatch]
+  )
+
   return {
     onUserInput,
-    onChangeRecipient
+    onChangeRecipient,
+    onChangeSelectedType
   }
 }
 
@@ -96,7 +107,7 @@ export function useDerivedTradeInfo(
   const { account, chainId } = useActiveWeb3React()
 
   // trade state
-  const { typedAmountValue, typedPriceValue, recipient } = useTradeState()
+  const { typedAmountValue, typedPriceValue, recipient, selectedType } = useTradeState()
 
   // tokens
   const currencies: { [field in Field]?: Currency } = useMemo(
@@ -119,7 +130,7 @@ export function useDerivedTradeInfo(
   const tokenA = wrappedCurrency(currencyA, chainId)
   const baseToken = orderBook?.baseToken?.token
   const type = !(tokenA && baseToken)
-    ? undefined
+    ? selectedType
     : baseToken.address === tokenA.address
     ? TradeType.LIMIT_SELL
     : TradeType.LIMIT_BUY
@@ -132,8 +143,14 @@ export function useDerivedTradeInfo(
   const parsedPriceAmount = tryParseAmount(typedPriceValue, orderBook?.quoteToken.currency)
   const tradeRet = useTradeRet(orderBook, type, parsedAmountAmount, parsedPriceAmount)
 
+  // pair
+  const [pairState, pair] = usePair(currencies[Field.CURRENCY_A], currencies[Field.CURRENCY_B])
+  const totalSupply = useTotalSupply(pair?.liquidityToken)
+  const noLiquidity: boolean =
+    pairState === PairState.NOT_EXISTS || Boolean(totalSupply && JSBI.equal(totalSupply.raw, ZERO))
+
   const trade = useMemo(() => {
-    if (orderBook && currencies[Field.CURRENCY_A] && currencies[Field.CURRENCY_B] && type) {
+    if (currencies[Field.CURRENCY_A] && currencies[Field.CURRENCY_B]) {
       return {
         orderBook: orderBook,
         baseToken: type === TradeType.LIMIT_SELL ? currencies[Field.CURRENCY_A] : currencies[Field.CURRENCY_B],
@@ -157,8 +174,8 @@ export function useDerivedTradeInfo(
     inputError = inputError ?? 'Select a token'
   }
 
-  if (!orderBook) {
-    inputError = inputError ?? 'Unavailable order book'
+  if (noLiquidity) {
+    inputError = inputError ?? 'Add liquidity first'
   }
 
   if (!parsedAmountAmount) {
@@ -264,7 +281,8 @@ export function queryParametersToTradeState(
     tradeState: {
       typedAmountValue: parseTokenAmountURLParameter(parsedQs.exactAmountAmount),
       typedPriceValue: parseTokenAmountURLParameter(parsedQs.exactPriceAmount),
-      recipient
+      recipient,
+      selectedType: TradeType.LIMIT_SELL
     }
   }
 }
@@ -288,7 +306,8 @@ export function useDefaultsFromURLSearch():
       replaceTradeState({
         typedAmountValue: parsed.tradeState.typedAmountValue,
         typedPriceValue: parsed.tradeState.typedPriceValue,
-        recipient: parsed.tradeState.recipient
+        recipient: parsed.tradeState.recipient,
+        selectedType: TradeType.LIMIT_SELL
       })
     )
 

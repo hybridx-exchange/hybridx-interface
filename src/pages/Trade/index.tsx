@@ -10,42 +10,42 @@ import {
   TradeType,
   ZERO
 } from '@hybridx-exchange/hybridx-sdk'
-import React, { useCallback, useContext, useEffect, useState } from 'react'
-import { ArrowDown } from 'react-feather'
+import React, {useCallback, useContext, useEffect, useState} from 'react'
+import {ArrowDown} from 'react-feather'
 import ReactGA from 'react-ga'
-import { Text } from 'rebass'
-import styled, { ThemeContext } from 'styled-components'
+import {Text} from 'rebass'
+import styled, {ThemeContext} from 'styled-components'
 import AddressInputPanel from '../../components/AddressInputPanel'
-import { ButtonConfirmed, ButtonError, ButtonLight } from '../../components/Button'
-import { GreyCard } from '../../components/Card'
-import { AutoColumn } from '../../components/Column'
+import {ButtonConfirmed, ButtonError, ButtonLight} from '../../components/Button'
+import {GreyCard} from '../../components/Card'
+import {AutoColumn} from '../../components/Column'
 import ConfirmTradeModal from '../../components/Trade/ConfirmTradeModal'
 import CurrencyInputPanel from '../../components/CurrencyInputPanel'
-import { SwapPoolTabs } from '../../components/NavigationTabs'
-import { AutoRow, RowBetween } from '../../components/Row'
-import { ArrowWrapper, BottomGrouping, SwapCallbackError, Wrapper } from '../../components/Swap/styleds'
+import {SwapPoolTabs} from '../../components/NavigationTabs'
+import {AutoRow, RowBetween} from '../../components/Row'
+import {ArrowWrapper, BottomGrouping, SwapCallbackError, Wrapper} from '../../components/Swap/styleds'
 import ProgressSteps from '../../components/ProgressSteps'
 
-import { ORDER_BOOK_ROUTER_ADDRESS } from '../../constants'
-import { useActiveWeb3React } from '../../hooks'
-import { useCurrency } from '../../hooks/Tokens'
-import { ApprovalState, useApproveCallback } from '../../hooks/useApproveCallback'
+import {ORDER_BOOK_ROUTER_ADDRESS} from '../../constants'
+import {useActiveWeb3React} from '../../hooks'
+import {useCurrency} from '../../hooks/Tokens'
+import {ApprovalState, useApproveCallback} from '../../hooks/useApproveCallback'
 import useENSAddress from '../../hooks/useENSAddress'
-import { useWalletModalToggle } from '../../state/application/hooks'
-import { Field, Input } from '../../state/trade/actions'
-import { tryParseAmount, useDerivedTradeInfo, useTradeActionHandlers, useTradeState } from '../../state/trade/hooks'
-import { useExpertModeManager, useUserDeadline } from '../../state/user/hooks'
-import { LinkStyledButton, StyledInternalLink, TYPE } from '../../theme'
-import { maxAmountSpend } from '../../utils/maxAmountSpend'
+import {useWalletModalToggle} from '../../state/application/hooks'
+import {Field, Input} from '../../state/trade/actions'
+import {tryParseAmount, useDerivedTradeInfo, useTradeActionHandlers, useTradeState} from '../../state/trade/hooks'
+import {useExpertModeManager, useUserDeadline} from '../../state/user/hooks'
+import {LinkStyledButton, StyledInternalLink, TYPE} from '../../theme'
+import {maxAmountSpend} from '../../utils/maxAmountSpend'
 import AppBody from '../AppBody'
 import Loader from '../../components/Loader'
-import { OrderBookTable } from '../../components/Swap/OrderBookTable'
-import { useTradeCallback } from '../../hooks/useTradeCallback'
-import { RouteComponentProps } from 'react-router'
-import { currencyId } from '../../utils/currencyId'
+import {OrderBookTable} from '../../components/Swap/OrderBookTable'
+import {useTradeCallback} from '../../hooks/useTradeCallback'
+import {RouteComponentProps} from 'react-router'
+import {currencyId} from '../../utils/currencyId'
 import CurrencySelectPanel from '../../components/CurrencySelectPanel'
-import { wrappedCurrency } from '../../utils/wrappedCurrency'
-import { formatUnits, parseUnits } from '@ethersproject/units'
+import {wrappedCurrency} from '../../utils/wrappedCurrency'
+import {formatUnits, parseUnits} from '@ethersproject/units'
 import AdvancedOrderBookDetailsDropdown from '../../components/Swap/AdvancedOrderBookDetailsDropdown'
 import OrderBookTipDropDown from '../../components/Swap/OrderBookTipDropDown'
 
@@ -71,7 +71,7 @@ export default function DoTrade({
   const [deadline] = useUserDeadline()
 
   // trade state
-  const { typedAmountValue, typedPriceValue, recipient } = useTradeState()
+  const { typedAmountValue, typedPriceValue, recipient, selectedType } = useTradeState()
   const [loadedCurrencyA, loadedCurrencyB] = [useCurrency(currencyIdA ?? 'ROSE'), useCurrency(currencyIdB)]
   const {
     trade,
@@ -96,7 +96,7 @@ export default function DoTrade({
     [Field.CURRENCY_B]: wrappedCurrencyB
   }
 
-  const { onUserInput, onChangeRecipient } = useTradeActionHandlers()
+  const { onUserInput, onChangeRecipient, onChangeSelectedType } = useTradeActionHandlers()
   const isValid = !tradeInputError && trade && trade.orderBook
 
   const handleInputAmount = useCallback(
@@ -317,6 +317,10 @@ export default function DoTrade({
     maxAmountInput && onUserInput(Input.AMOUNT, maxAmountInput.toExact())
   }, [maxAmountInput, onUserInput])
 
+  const handleReserveCurrency = useCallback(() => {
+    onChangeSelectedType(selectedType === TradeType.LIMIT_SELL ? TradeType.LIMIT_BUY : TradeType.LIMIT_SELL)
+  }, [selectedType, onChangeSelectedType])
+
   return (
     <>
       <AppBody>
@@ -374,7 +378,7 @@ export default function DoTrade({
               onCurrencySelect={handleCurrencyASelect}
               otherCurrency={currencies[Field.CURRENCY_B]}
               isOrderBook={true}
-              inputDisable={!trade?.orderBook}
+              inputDisable={!trade}
               id="trade-currency-amount"
             />
             <AutoColumn justify="space-between">
@@ -396,8 +400,10 @@ export default function DoTrade({
               onCurrencySelect={handleCurrencyBSelect}
               otherCurrency={currencies[Field.CURRENCY_A]}
               isOrderBook={true}
-              inputDisable={!trade?.orderBook}
+              inputDisable={!trade}
               id="trade-currency-price"
+              enableReserveCurrency={true}
+              onCurrencyReserve={handleReserveCurrency}
             />
 
             {recipient !== null ? (
