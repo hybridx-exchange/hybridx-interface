@@ -71,7 +71,7 @@ interface OrderBookTableProps {
 }
 
 export function OrderBookTable({ orderBook, currencyA, currencyB }: OrderBookTableProps) {
-  const show = Boolean(orderBook)
+  const show = Boolean(orderBook && orderBook.exist)
   const buyData = orderBook?.buyOrders ?? []
   const sellData = orderBook?.sellOrders ?? []
   const buyOrdersLength = buyData.length

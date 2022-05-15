@@ -38,6 +38,7 @@ import { abi as IOrderBookRouterABI } from '@hybridx-exchange/hybridx-protocol/b
 import { abi as IOrderBookABI } from '@hybridx-exchange/hybridx-protocol/build/IOrderBook.json'
 import { Interface } from '@ethersproject/abi'
 import { useUserSingleHopOnly } from '../state/user/hooks'
+import { BigNumber } from 'ethers'
 
 function useAllCommonPairs(currencyA?: Currency, currencyB?: Currency): Pair[] {
   const { chainId } = useActiveWeb3React()
@@ -298,11 +299,12 @@ export function useOrderBook(currencyIn?: Currency | undefined, currencyOut?: Cu
   const orderBookAddress =
     tokenIn && tokenOut && tokenIn.address !== tokenOut.address ? OrderBook.getAddress(tokenIn, tokenOut) : ''
   const orderBookInterface = new Interface(IOrderBookABI)
+  const pairUtilsInterface = new Interface(IPairUtilsABI)
   const configInterface = new Interface(IConfigABI)
   const results = useMultipleContractMultipleData(
     [
       tokenIn && tokenOut && tokenIn.address !== tokenOut.address ? ORDER_BOOK_ROUTER_ADDRESS : '',
-      orderBookAddress,
+      tokenIn && tokenOut && tokenIn.address !== tokenOut.address ? PAIR_UTILS_ADDRESS : '',
       orderBookAddress,
       CONFIG_ADDRESS,
       CONFIG_ADDRESS,
@@ -311,7 +313,7 @@ export function useOrderBook(currencyIn?: Currency | undefined, currencyOut?: Cu
     ],
     [
       new Interface(IOrderBookRouterABI),
-      orderBookInterface,
+      pairUtilsInterface,
       orderBookInterface,
       configInterface,
       configInterface,
@@ -331,7 +333,7 @@ export function useOrderBook(currencyIn?: Currency | undefined, currencyOut?: Cu
       tokenIn && tokenOut
         ? [tokenIn.address, tokenOut.address, DEFAULT_LIMIT_SIZE]
         : [ZERO_ADDRESS, ZERO_ADDRESS, DEFAULT_LIMIT_SIZE],
-      [],
+      tokenIn && tokenOut ? [tokenIn.address, tokenOut.address] : [ZERO_ADDRESS, ZERO_ADDRESS],
       [],
       [orderBookAddress === '' ? ZERO_ADDRESS : orderBookAddress],
       [orderBookAddress === '' ? ZERO_ADDRESS : orderBookAddress],
@@ -352,9 +354,7 @@ export function useOrderBook(currencyIn?: Currency | undefined, currencyOut?: Cu
       returns.length === 0 ||
       returns[0].loading ||
       returns.length !== 7 ||
-      !returns[0].data ||
       !returns[1].data ||
-      !returns[2].data ||
       !returns[3].data ||
       !returns[4].data ||
       !returns[5].data ||
@@ -368,10 +368,10 @@ export function useOrderBook(currencyIn?: Currency | undefined, currencyOut?: Cu
     } = returns[0]
     const {
       data: [baseReserve, quoteReserve]
-    } = returns[1] ?? [undefined, undefined]
+    } = returns[1]
     const {
       data: [baseTokenAddress]
-    } = returns[2]
+    } = returns[2].data ? returns[2] : { data: [tokenIn?.address ?? ZERO_ADDRESS] }
     const {
       data: [protocolFeeRate]
     } = returns[3]
@@ -384,30 +384,39 @@ export function useOrderBook(currencyIn?: Currency | undefined, currencyOut?: Cu
     const {
       data: [priceStep]
     } = returns[6]
-    const baseToken = baseTokenAddress.toLowerCase() === tokenIn?.address.toLowerCase() ? tokenIn : tokenOut
-    const quoteToken = baseTokenAddress.toLowerCase() === tokenIn?.address.toLowerCase() ? tokenOut : tokenIn
-    if (
-      baseToken &&
-      quoteToken &&
-      buyPrices &&
-      buyAmounts &&
-      sellPrices &&
-      sellAmounts &&
-      priceStepFactor &&
-      priceStep
-    ) {
+    const baseToken = baseTokenAddress
+      ? baseTokenAddress.toLowerCase() === tokenIn?.address.toLowerCase()
+        ? tokenIn
+        : tokenOut
+      : tokenIn
+    const quoteToken = baseTokenAddress
+      ? baseTokenAddress.toLowerCase() === tokenIn?.address.toLowerCase()
+        ? tokenOut
+        : tokenIn
+      : tokenOut
+    if (baseToken && quoteToken && priceStepFactor && priceStep) {
       const baseAmount = wrappedCurrencyAmount(new TokenAmount(baseToken, baseReserve), baseToken.chainId)
       const quoteAmount = wrappedCurrencyAmount(new TokenAmount(quoteToken, quoteReserve), quoteToken.chainId)
-      const curPrice = wrappedCurrencyAmount(new TokenAmount(quoteToken, price), quoteToken.chainId)
+      const exist = !price || price.eq(BigNumber.from(0)) ? false : true
+      const curPrice = exist
+        ? wrappedCurrencyAmount(new TokenAmount(quoteToken, price), quoteToken.chainId)
+        : OrderBook.culPrice(baseAmount, quoteAmount)
+      console.log(
+        baseAmount?.toSignificant(6),
+        quoteAmount?.toSignificant(6),
+        price.toString(),
+        curPrice?.toSignificant(6)
+      )
+
       const buyOrders: Order[] = []
-      for (let i = 0; i < buyPrices.length; i++) {
+      for (let i = 0; i < buyPrices?.length; i++) {
         const buyPrice = wrappedCurrencyAmount(new TokenAmount(quoteToken, buyPrices[i]), quoteToken.chainId)
         const buyAmount = wrappedCurrencyAmount(new TokenAmount(quoteToken, buyAmounts[i]), quoteToken.chainId)
         if (buyPrice && buyAmount) buyOrders.push(new Order(buyPrice, buyAmount))
       }
 
       const sellOrders: Order[] = []
-      for (let i = 0; i < sellPrices.length; i++) {
+      for (let i = 0; i < sellPrices?.length; i++) {
         const sellPrice = wrappedCurrencyAmount(new TokenAmount(quoteToken, sellPrices[i]), quoteToken.chainId)
         const sellAmount = wrappedCurrencyAmount(new TokenAmount(baseToken, sellAmounts[i]), baseToken.chainId)
         if (sellPrice && sellAmount) sellOrders.push(new Order(sellPrice, sellAmount))
@@ -415,6 +424,7 @@ export function useOrderBook(currencyIn?: Currency | undefined, currencyOut?: Cu
 
       return baseAmount && quoteAmount && curPrice
         ? new OrderBook(
+            exist,
             baseAmount,
             quoteAmount,
             priceStep,

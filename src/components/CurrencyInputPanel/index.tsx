@@ -148,8 +148,8 @@ interface CurrencyInputPanelProps {
   isOrderBook?: boolean
   hideCurrency?: boolean
   inputDisable?: boolean
-  enableReserveCurrency?: boolean
-  onCurrencyReserve?: () => void
+  enableReverseCurrency?: boolean
+  onCurrencyReverse?: () => void
 }
 
 export default function CurrencyInputPanel({
@@ -170,8 +170,8 @@ export default function CurrencyInputPanel({
   isOrderBook,
   hideCurrency,
   inputDisable,
-  enableReserveCurrency = false,
-  onCurrencyReserve
+  enableReverseCurrency = false,
+  onCurrencyReverse
 }: CurrencyInputPanelProps) {
   const { t } = useTranslation()
 
@@ -195,18 +195,18 @@ export default function CurrencyInputPanel({
               </TYPE.body>
               {account && (
                 <TYPE.body
-                  onClick={onCurrencyReserve ? onCurrencyReserve : onMax}
+                  onClick={onCurrencyReverse ? onCurrencyReverse : onMax}
                   color={theme.text2}
                   fontWeight={500}
                   fontSize={14}
                   style={{ display: 'inline', cursor: 'pointer' }}
                 >
-                  {!enableReserveCurrency &&
+                  {!enableReverseCurrency &&
                     (!hideBalance && !!currency && selectedCurrencyBalance
                       ? 'Balance: ' + selectedCurrencyBalance?.toSignificant(6)
                       : ' -')}
-                  {enableReserveCurrency && (
-                    <span role="img" aria-label="arrow" onClick={onCurrencyReserve}>
+                  {enableReverseCurrency && (
+                    <span role="img" aria-label="arrow">
                       🔁
                     </span>
                   )}

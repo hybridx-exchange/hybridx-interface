@@ -88,6 +88,7 @@ export default function DoTrade({
 
   const wrappedCurrencyA = wrappedCurrency(loadedCurrencyA ?? undefined, chainId)
   const wrappedCurrencyB = wrappedCurrency(loadedCurrencyB ?? undefined, chainId)
+  const createAndTrade = trade?.orderBook?.exist === false
 
   const { onUserInput, onChangeRecipient, onChangeSelectedType } = useTradeActionHandlers()
   const isValid = !tradeInputError && trade && trade.orderBook
@@ -116,9 +117,10 @@ export default function DoTrade({
   )
   const handleInputPrice = useCallback(
     (value: string) => {
-      if (trade?.quoteToken && value) {
+      if (trade?.orderBook && trade?.quoteToken && value) {
         const priceAmount = parseBigintIsh(parseUnits(value, trade.quoteToken.decimals).toString())
         const priceStep = parseBigintIsh(trade?.orderBook?.priceStep as BigintIsh)
+        console.log(priceStep.toString())
         if (priceAmount && priceStep && !JSBI.equal(JSBI.remainder(priceAmount, priceStep), ZERO)) {
           value = formatUnits(
             JSBI.multiply(JSBI.divide(priceAmount, priceStep), priceStep).toString(),
@@ -395,8 +397,8 @@ export default function DoTrade({
               isOrderBook={true}
               inputDisable={!trade}
               id="trade-currency-price"
-              enableReserveCurrency={true}
-              onCurrencyReserve={handleReserveCurrency}
+              enableReverseCurrency={createAndTrade}
+              onCurrencyReverse={handleReserveCurrency}
             />
 
             {recipient !== null ? (

@@ -78,7 +78,7 @@ export default function ConfirmTradeModal({
   // text to show while loading
   const pendingText = `${
     trade?.tradeType === TradeType.LIMIT_BUY ? 'Buy ' + trade?.baseToken?.symbol + ' with amount ' : 'Sell amount '
-  } ${trade?.amount?.toFixedWithoutExtraZero(trade?.orderBook.getMinAmountDecimal(trade?.tradeType))} ${' ' +
+  } ${trade?.amount?.toFixedWithoutExtraZero(trade?.orderBook?.getMinAmountDecimal(trade?.tradeType))} ${' ' +
     trade?.amount?.currency?.symbol} at price ${' ' +
     trade?.price?.toFixedWithoutExtraZero(trade?.orderBook?.getPriceStepDecimal())} ${' ' +
     trade?.price?.currency?.symbol}`

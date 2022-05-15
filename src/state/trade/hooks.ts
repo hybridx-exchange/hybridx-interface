@@ -129,9 +129,9 @@ export function useDerivedTradeInfo(
   const orderBook = useOrderBook(currencyA ?? undefined, currencyB ?? undefined)
   const tokenA = wrappedCurrency(currencyA, chainId)
   const baseToken = orderBook?.baseToken?.token
-  const type = !(tokenA && baseToken)
+  const type = !orderBook?.exist
     ? selectedType
-    : baseToken.address === tokenA.address
+    : baseToken?.address === tokenA?.address
     ? TradeType.LIMIT_SELL
     : TradeType.LIMIT_BUY
   const currencyBalances = {
