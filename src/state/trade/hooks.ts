@@ -202,9 +202,15 @@ export function useDerivedTradeInfo(
   }
 
   if (
-    orderBook?.priceStep &&
     parsedPriceAmount &&
-    !JSBI.equal(JSBI.remainder(parsedPriceAmount?.raw as JSBI, parseBigintIsh(orderBook?.priceStep as BigintIsh)), ZERO)
+    orderBook?.getPriceStep(parsedPriceAmount?.raw) &&
+    !JSBI.equal(
+      JSBI.remainder(
+        parsedPriceAmount?.raw as JSBI,
+        parseBigintIsh(orderBook?.getPriceStep(parsedPriceAmount?.raw) as BigintIsh)
+      ),
+      ZERO
+    )
   ) {
     inputError = inputError ?? 'Invalid price'
   }
