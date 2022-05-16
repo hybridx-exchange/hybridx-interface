@@ -422,7 +422,7 @@ export function useOrderBook(
       const quoteAmount = wrappedCurrencyAmount(new TokenAmount(quoteToken, quoteReserve), quoteToken.chainId)
       const curPrice = exist
         ? wrappedCurrencyAmount(new TokenAmount(quoteToken, price), quoteToken.chainId)
-        : baseReserve?.raw?.greaterThan(parseBigintIsh('0'))
+        : JSBI.GT(baseReserve, parseBigintIsh('0'))
         ? OrderBook.culPrice(baseAmount, quoteAmount)
         : undefined
       const buyOrders: Order[] = []
