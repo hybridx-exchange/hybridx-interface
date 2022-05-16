@@ -151,20 +151,25 @@ export function useDerivedTradeInfo(
 
   const trade = useMemo(() => {
     if (currencies[Field.CURRENCY_A] && currencies[Field.CURRENCY_B]) {
-      return {
-        orderBook: orderBook,
-        baseToken: type === TradeType.LIMIT_SELL ? currencies[Field.CURRENCY_A] : currencies[Field.CURRENCY_B],
-        quoteToken: type !== TradeType.LIMIT_SELL ? currencies[Field.CURRENCY_A] : currencies[Field.CURRENCY_B],
-        tradeType: type,
-        amount: parsedAmountAmount,
-        price: parsedPriceAmount,
-        tradeRet: tradeRet
+      const baseToken = type === TradeType.LIMIT_SELL ? currencies[Field.CURRENCY_A] : currencies[Field.CURRENCY_B]
+      const quoteToken = type !== TradeType.LIMIT_SELL ? currencies[Field.CURRENCY_A] : currencies[Field.CURRENCY_B]
+      console.log(wrappedCurrency(baseToken, chainId), orderBook?.baseToken.token)
+      if (wrappedCurrency(baseToken, chainId) === orderBook?.baseToken.token) {
+        return {
+          orderBook: orderBook,
+          baseToken: baseToken,
+          quoteToken: quoteToken,
+          tradeType: type,
+          amount: parsedAmountAmount,
+          price: parsedPriceAmount,
+          tradeRet: tradeRet
+        }
       }
     }
 
     return null
   }, [orderBook, currencies, type, tradeRet, parsedPriceAmount, parsedAmountAmount])
-  console.log(trade) //orderBook可能出现变化不及时而出现异常的情况
+
   let inputError: string | undefined
   if (!account) {
     inputError = 'Connect Wallet'

@@ -375,7 +375,7 @@ export function useOrderBook(
     } = returns[1]
     const {
       data: [baseTokenAddress]
-    } = returns[2].data ? returns[2] : { data: [tokenIn?.address ?? ZERO_ADDRESS] }
+    } = returns[2].data ? returns[2] : { data: [ZERO_ADDRESS] }
     const {
       data: [protocolFeeRate]
     } = returns[3]
@@ -388,14 +388,15 @@ export function useOrderBook(
     const {
       data: [priceStep]
     } = returns[6]
-    const baseToken = baseTokenAddress
+    const exist = !price || price.eq(BigNumber.from(0)) ? false : true
+    const baseToken = exist
       ? baseTokenAddress.toLowerCase() === tokenIn?.address.toLowerCase()
         ? tokenIn
         : tokenOut
       : selectedType === TradeType.LIMIT_SELL
       ? tokenIn
       : tokenOut
-    const quoteToken = baseTokenAddress
+    const quoteToken = exist
       ? baseTokenAddress.toLowerCase() === tokenIn?.address.toLowerCase()
         ? tokenOut
         : tokenIn
@@ -403,14 +404,14 @@ export function useOrderBook(
       ? tokenOut
       : tokenIn
     if (baseToken && quoteToken && priceStepFactor && priceStep) {
-      const baseReserve = baseTokenAddress
+      const baseReserve = exist
         ? baseTokenAddress.toLowerCase() === tokenIn?.address.toLowerCase()
           ? reserveIn
           : reserveOut
         : selectedType === TradeType.LIMIT_SELL
         ? reserveOut
         : reserveIn
-      const quoteReserve = baseTokenAddress
+      const quoteReserve = exist
         ? baseTokenAddress.toLowerCase() === tokenIn?.address.toLowerCase()
           ? reserveOut
           : reserveIn
@@ -419,7 +420,6 @@ export function useOrderBook(
         : reserveOut
       const baseAmount = wrappedCurrencyAmount(new TokenAmount(baseToken, baseReserve), baseToken.chainId)
       const quoteAmount = wrappedCurrencyAmount(new TokenAmount(quoteToken, quoteReserve), quoteToken.chainId)
-      const exist = !price || price.eq(BigNumber.from(0)) ? false : true
       const curPrice = exist
         ? wrappedCurrencyAmount(new TokenAmount(quoteToken, price), quoteToken.chainId)
         : OrderBook.culPrice(baseAmount, quoteAmount)
