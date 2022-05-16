@@ -1,15 +1,15 @@
-import { Currency, CurrencyAmount, JSBI, OrderBook, Pair } from '@hybridx-exchange/hybridx-sdk'
-import { useCallback, useMemo } from 'react'
-import { useDispatch, useSelector } from 'react-redux'
-import { PairState, usePair } from '../../data/Reserves'
-import { useTotalSupply } from '../../data/TotalSupply'
+import {Currency, CurrencyAmount, JSBI, OrderBook, Pair, TradeType} from '@hybridx-exchange/hybridx-sdk'
+import {useCallback, useMemo} from 'react'
+import {useDispatch, useSelector} from 'react-redux'
+import {PairState, usePair} from '../../data/Reserves'
+import {useTotalSupply} from '../../data/TotalSupply'
 
-import { useActiveWeb3React } from '../../hooks'
-import { AppDispatch, AppState } from '../index'
-import { tryParseAmount } from '../swap/hooks'
-import { Field, orderBookTypeInput } from './actions'
-import { useOrderBook } from '../../hooks/Trades'
-import { useCurrencyBalances } from '../wallet/hooks'
+import {useActiveWeb3React} from '../../hooks'
+import {AppDispatch, AppState} from '../index'
+import {tryParseAmount} from '../swap/hooks'
+import {Field, orderBookTypeInput} from './actions'
+import {useOrderBook} from '../../hooks/Trades'
+import {useCurrencyBalances} from '../wallet/hooks'
 
 const ZERO = JSBI.BigInt(0)
 
@@ -35,7 +35,7 @@ export function useDerivedOrderBookInfo(
 
   const { priceStepValue, minAmountValue } = useOrderBookState()
 
-  const orderBook = useOrderBook(currencyBase ?? undefined, currencyQuote ?? undefined)
+  const orderBook = useOrderBook(TradeType.LIMIT_SELL, currencyBase ?? undefined, currencyQuote ?? undefined)
 
   // tokens
   const currencies: { [field in Field]?: Currency } = useMemo(

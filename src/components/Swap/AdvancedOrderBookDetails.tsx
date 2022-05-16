@@ -9,8 +9,8 @@ import { RowBetween, RowFixed } from '../Row'
 function TradeSummary({ trade }: { trade: Trade }) {
   const theme = useContext(ThemeContext)
   const tradeRet = trade?.tradeRet
-  const inDecimal = trade?.orderBook.getMinAmountDecimal(trade?.tradeType)
-  const outDecimal = trade?.orderBook.getMinOutputAmountDecimal(trade?.tradeType)
+  const inDecimal = trade?.orderBook?.getMinAmountDecimal(trade?.tradeType)
+  const outDecimal = trade?.orderBook?.getMinOutputAmountDecimal(trade?.tradeType)
   return (
     <>
       <AutoColumn style={{ padding: '0 20px' }}>
@@ -23,13 +23,13 @@ function TradeSummary({ trade }: { trade: Trade }) {
           </RowFixed>
           <RowFixed>
             <TYPE.black color={theme.text1} fontSize={14}>
-              {tradeRet?.ammAmountIn.toFixedWithoutExtraZero(inDecimal) +
+              {tradeRet?.ammAmountIn?.toFixedWithoutExtraZero(inDecimal) +
                 ' ' +
-                tradeRet?.ammAmountIn.currency.symbol +
+                tradeRet?.ammAmountIn?.currency.symbol +
                 '/' +
-                tradeRet?.ammAmountOut.toFixedWithoutExtraZero(outDecimal) +
+                tradeRet?.ammAmountOut?.toFixedWithoutExtraZero(outDecimal) +
                 ' ' +
-                tradeRet?.ammAmountOut.currency.symbol}
+                tradeRet?.ammAmountOut?.currency.symbol}
             </TYPE.black>
           </RowFixed>
         </RowBetween>
@@ -43,13 +43,13 @@ function TradeSummary({ trade }: { trade: Trade }) {
           </RowFixed>
           <RowFixed>
             <TYPE.black color={theme.text1} fontSize={14}>
-              {tradeRet?.orderAmountIn.toFixedWithoutExtraZero(inDecimal) +
+              {tradeRet?.orderAmountIn?.toFixedWithoutExtraZero(inDecimal) +
                 ' ' +
-                tradeRet?.orderAmountIn.currency.symbol +
+                tradeRet?.orderAmountIn?.currency.symbol +
                 '/' +
-                tradeRet?.orderAmountOut.toFixedWithoutExtraZero(outDecimal) +
+                tradeRet?.orderAmountOut?.toFixedWithoutExtraZero(outDecimal) +
                 ' ' +
-                tradeRet?.orderAmountOut.currency.symbol}
+                tradeRet?.orderAmountOut?.currency.symbol}
             </TYPE.black>
           </RowFixed>
         </RowBetween>
@@ -63,13 +63,13 @@ function TradeSummary({ trade }: { trade: Trade }) {
           </RowFixed>
           <TYPE.black fontSize={14} color={theme.text1}>
             <TYPE.black color={theme.text1} fontSize={14}>
-              {tradeRet?.amountLeft.toFixedWithoutExtraZero(inDecimal) +
+              {tradeRet?.amountLeft?.toFixedWithoutExtraZero(inDecimal) +
                 ' ' +
-                tradeRet?.amountLeft.currency.symbol +
+                tradeRet?.amountLeft?.currency.symbol +
                 '/' +
-                tradeRet?.amountExpect.toFixedWithoutExtraZero(outDecimal) +
+                tradeRet?.amountExpect?.toFixedWithoutExtraZero(outDecimal) +
                 ' ' +
-                tradeRet?.amountExpect.currency.symbol}
+                tradeRet?.amountExpect?.currency.symbol}
             </TYPE.black>
           </TYPE.black>
         </RowBetween>
@@ -85,11 +85,11 @@ function TradeSummary({ trade }: { trade: Trade }) {
             <TYPE.black fontSize={14}>
               {trade?.orderBook?.curPrice?.toFixedWithoutExtraZero(trade?.orderBook.getPriceStepDecimal()) +
                 ' ' +
-                trade?.orderBook?.curPrice.currency.symbol +
+                trade?.orderBook?.curPrice?.currency.symbol +
                 ' -> ' +
-                tradeRet?.priceTo?.toFixedWithoutExtraZero(trade?.orderBook.getPriceStepDecimal()) +
+                tradeRet?.priceTo?.toFixedWithoutExtraZero(trade?.orderBook?.getPriceStepDecimal()) +
                 ' ' +
-                tradeRet?.priceTo.currency.symbol}
+                tradeRet?.priceTo?.currency.symbol}
             </TYPE.black>
           </RowFixed>
         </RowBetween>

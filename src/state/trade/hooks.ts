@@ -126,12 +126,12 @@ export function useDerivedTradeInfo(
     currencies[Field.CURRENCY_B] ?? undefined
   ])
 
-  const orderBook = useOrderBook(currencyA ?? undefined, currencyB ?? undefined)
-  const tokenA = wrappedCurrency(currencyA, chainId)
+  const orderBook = useOrderBook(selectedType, currencyA ?? undefined, currencyB ?? undefined)
+  const tokenIn = wrappedCurrency(currencyA, chainId)
   const baseToken = orderBook?.baseToken?.token
   const type = !orderBook?.exist
     ? selectedType
-    : baseToken?.address === tokenA?.address
+    : baseToken?.address === tokenIn?.address
     ? TradeType.LIMIT_SELL
     : TradeType.LIMIT_BUY
   const currencyBalances = {
@@ -164,7 +164,7 @@ export function useDerivedTradeInfo(
 
     return null
   }, [orderBook, currencies, type, tradeRet, parsedPriceAmount, parsedAmountAmount])
-
+  console.log(trade) //orderBook可能出现变化不及时而出现异常的情况
   let inputError: string | undefined
   if (!account) {
     inputError = 'Connect Wallet'

@@ -1,29 +1,30 @@
 import useENS from '../../hooks/useENS'
-import { parseUnits } from '@ethersproject/units'
+import {parseUnits} from '@ethersproject/units'
 import {
   Currency,
   CurrencyAmount,
   ETHER,
   JSBI,
   OrderBook,
+  Swap,
   Token,
   TokenAmount,
-  Swap
+  TradeType
 } from '@hybridx-exchange/hybridx-sdk'
-import { ParsedQs } from 'qs'
-import { useCallback, useEffect, useState } from 'react'
-import { useDispatch, useSelector } from 'react-redux'
-import { useActiveWeb3React } from '../../hooks'
-import { useCurrency } from '../../hooks/Tokens'
-import { useOrderBook, useSwapExactIn, useSwapExactOut } from '../../hooks/Trades'
+import {ParsedQs} from 'qs'
+import {useCallback, useEffect, useState} from 'react'
+import {useDispatch, useSelector} from 'react-redux'
+import {useActiveWeb3React} from '../../hooks'
+import {useCurrency} from '../../hooks/Tokens'
+import {useOrderBook, useSwapExactIn, useSwapExactOut} from '../../hooks/Trades'
 import useParsedQueryString from '../../hooks/useParsedQueryString'
-import { isAddress } from '../../utils'
-import { AppDispatch, AppState } from '../index'
-import { useCurrencyBalances } from '../wallet/hooks'
-import { Field, replaceSwapState, selectCurrency, setRecipient, switchCurrencies, typeInput } from './actions'
-import { SwapState } from './reducer'
-import { useUserSlippageTolerance } from '../user/hooks'
-import { computeSlippageAdjustedAmounts } from '../../utils/prices'
+import {isAddress} from '../../utils'
+import {AppDispatch, AppState} from '../index'
+import {useCurrencyBalances} from '../wallet/hooks'
+import {Field, replaceSwapState, selectCurrency, setRecipient, switchCurrencies, typeInput} from './actions'
+import {SwapState} from './reducer'
+import {useUserSlippageTolerance} from '../user/hooks'
+import {computeSlippageAdjustedAmounts} from '../../utils/prices'
 
 export function useSwapState(): AppState['swap'] {
   return useSelector<AppState, AppState['swap']>(state => state.swap)
@@ -146,7 +147,7 @@ export function useDerivedSwapInfo(): {
 
   const bestTradeExactIn = useSwapExactIn(isExactIn ? parsedAmount : undefined, outputCurrency ?? undefined)
   const bestTradeExactOut = useSwapExactOut(inputCurrency ?? undefined, !isExactIn ? parsedAmount : undefined)
-  const orderBook = useOrderBook(inputCurrency ?? undefined, outputCurrency ?? undefined)
+  const orderBook = useOrderBook(TradeType.LIMIT_SELL, inputCurrency ?? undefined, outputCurrency ?? undefined)
 
   const v2Swap = isExactIn ? bestTradeExactIn : bestTradeExactOut
 

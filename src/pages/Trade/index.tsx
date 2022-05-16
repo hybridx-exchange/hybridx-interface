@@ -3,14 +3,13 @@ import {
   Currency,
   CurrencyAmount,
   JSBI,
-  OrderBook,
   parseBigintIsh,
   TokenAmount,
   Trade,
   TradeType,
   ZERO
 } from '@hybridx-exchange/hybridx-sdk'
-import React, { useCallback, useContext, useEffect, useMemo, useState } from 'react'
+import React, { useCallback, useContext, useEffect, useState } from 'react'
 import { ArrowDown } from 'react-feather'
 import ReactGA from 'react-ga'
 import { Text } from 'rebass'
@@ -94,70 +93,39 @@ export default function DoTrade({
   const { onUserInput, onChangeRecipient, onChangeSelectedType } = useTradeActionHandlers()
   const isValid = !tradeInputError && trade
 
-  const adjustTrade = useMemo(() => {
-    if (selectedType === TradeType.LIMIT_BUY && trade && !trade?.orderBook?.exist) {
-      const orderBook = new OrderBook(
-        false,
-        trade?.orderBook?.quoteToken,
-        trade?.orderBook?.baseToken,
-        trade?.orderBook?.priceStep,
-        trade?.orderBook?.priceStepFactor,
-        trade?.orderBook?.protocolFeeRate,
-        trade?.orderBook?.subsidyFeeRate,
-        OrderBook.culPrice(
-          trade?.orderBook?.quoteToken as TokenAmount,
-          trade?.orderBook?.baseToken as TokenAmount
-        ) as TokenAmount,
-        [],
-        []
-      )
-      return new Trade(
-        orderBook,
-        trade.tradeType,
-        trade.baseToken,
-        trade.quoteToken,
-        trade.amount,
-        trade.price,
-        trade.tradeRet
-      )
-    } else {
-      return trade
-    }
-  }, [selectedType, trade])
-
   const handleInputAmount = useCallback(
     (value: string) => {
-      const minAmount = adjustTrade?.orderBook?.minAmount
-      const tradeType = adjustTrade?.tradeType
-      if (tradeType && adjustTrade?.baseToken && adjustTrade?.quoteToken && minAmount) {
+      const minAmount = trade?.orderBook?.minAmount
+      const tradeType = trade?.tradeType
+      if (tradeType && trade?.baseToken && trade?.quoteToken && minAmount) {
         if (tradeType === TradeType.LIMIT_BUY) {
-          const amountAmount = tryParseAmount(value, adjustTrade?.quoteToken)
+          const amountAmount = tryParseAmount(value, trade?.quoteToken)
           const minQuoteAmount = parsedPriceAmount
-            ? adjustTrade?.orderBook.getMinQuoteAmount(parsedPriceAmount?.raw)
+            ? trade?.orderBook.getMinQuoteAmount(parsedPriceAmount?.raw)
             : ZERO
           if (amountAmount && JSBI.LT(amountAmount?.raw, minQuoteAmount)) {
-            value = new TokenAmount(adjustTrade.quoteToken, minQuoteAmount).toSignificant()
+            value = new TokenAmount(trade.quoteToken, minQuoteAmount).toSignificant()
           }
         } else if (tradeType === TradeType.LIMIT_SELL) {
-          const amountAmount = tryParseAmount(value, adjustTrade?.baseToken)
+          const amountAmount = tryParseAmount(value, trade?.baseToken)
           if (amountAmount && JSBI.LT(amountAmount?.raw, parseBigintIsh(minAmount as BigintIsh))) {
-            value = new TokenAmount(adjustTrade.baseToken, minAmount).toSignificant()
+            value = new TokenAmount(trade.baseToken, minAmount).toSignificant()
           }
         }
       }
       onUserInput(Input.AMOUNT, value)
     },
-    [onUserInput, parsedPriceAmount, adjustTrade]
+    [onUserInput, parsedPriceAmount, trade]
   )
   const handleInputPrice = useCallback(
     (value: string) => {
-      if (adjustTrade?.orderBook && adjustTrade?.quoteToken && value) {
-        const priceAmount = parseBigintIsh(parseUnits(value, adjustTrade.quoteToken.decimals).toString())
-        const priceStep = parseBigintIsh(adjustTrade?.orderBook?.getPriceStep(priceAmount) as BigintIsh)
+      if (trade?.orderBook && trade?.quoteToken && value) {
+        const priceAmount = parseBigintIsh(parseUnits(value, trade.quoteToken.decimals).toString())
+        const priceStep = parseBigintIsh(trade?.orderBook?.getPriceStep(priceAmount) as BigintIsh)
         if (priceAmount && priceStep && !JSBI.equal(JSBI.remainder(priceAmount, priceStep), ZERO)) {
           value = formatUnits(
             JSBI.multiply(JSBI.divide(priceAmount, priceStep), priceStep).toString(),
-            adjustTrade.quoteToken.decimals
+            trade.quoteToken.decimals
           )
         }
 
@@ -168,7 +136,7 @@ export default function DoTrade({
 
       onUserInput(Input.PRICE, value)
     },
-    [onUserInput, adjustTrade, handleInputAmount, typedAmountValue]
+    [onUserInput, trade, handleInputAmount, typedAmountValue]
   )
 
   // modal and loading
@@ -230,7 +198,7 @@ export default function DoTrade({
 
   // the callback to execute the trade
   const { callback: tradeCallback, error: tradeCallbackError } = useTradeCallback(
-    isValid ? adjustTrade ?? undefined : undefined,
+    isValid ? trade ?? undefined : undefined,
     deadline,
     recipient
   )
@@ -300,13 +268,13 @@ export default function DoTrade({
 
   const handleAcceptChanges = useCallback(() => {
     setTradeState({
-      tradeToConfirm: adjustTrade ?? undefined,
+      tradeToConfirm: trade ?? undefined,
       tradeErrorMessage: tradeErrorMessage,
       txHash,
       attemptingTxn,
       showConfirm
     })
-  }, [attemptingTxn, showConfirm, tradeErrorMessage, adjustTrade, txHash])
+  }, [attemptingTxn, showConfirm, tradeErrorMessage, trade, txHash])
 
   const handleCurrencyASelect = useCallback(
     (currencyA: Currency) => {
@@ -480,7 +448,7 @@ export default function DoTrade({
                       handleTrade()
                     } else {
                       setTradeState({
-                        tradeToConfirm: adjustTrade ?? undefined,
+                        tradeToConfirm: trade ?? undefined,
                         attemptingTxn: false,
                         tradeErrorMessage: undefined,
                         showConfirm: true,
@@ -505,7 +473,7 @@ export default function DoTrade({
                     handleTrade()
                   } else {
                     setTradeState({
-                      tradeToConfirm: adjustTrade ?? undefined,
+                      tradeToConfirm: trade ?? undefined,
                       attemptingTxn: false,
                       tradeErrorMessage: undefined,
                       showConfirm: true,
@@ -514,11 +482,19 @@ export default function DoTrade({
                   }
                 }}
                 id="trade-button"
-                disabled={!isValid || !!tradeCallbackError}
+                disabled={!isValid || !!tradeCallbackError || !trade?.tradeRet}
                 error={!isValid && !!typedAmountValue && !!typedPriceValue}
               >
                 <Text fontSize={20} fontWeight={500}>
-                  {tradeInputError ? tradeInputError : adjustTrade?.tradeType === TradeType.LIMIT_BUY ? `Buy` : `Sell`}
+                  {tradeInputError
+                    ? tradeInputError
+                    : createAndTrade
+                    ? trade?.tradeType === TradeType.LIMIT_BUY
+                      ? `Create & Buy`
+                      : `Create & Sell`
+                    : trade?.tradeType === TradeType.LIMIT_BUY
+                    ? `Buy`
+                    : `Sell`}
                 </Text>
               </ButtonError>
             )}
@@ -527,9 +503,9 @@ export default function DoTrade({
           </BottomGrouping>
         </Wrapper>
       </AppBody>
-      <AdvancedOrderBookDetailsDropdown trade={adjustTrade ?? undefined} />
+      <AdvancedOrderBookDetailsDropdown trade={trade ?? undefined} />
       <OrderBookTable
-        orderBook={adjustTrade?.orderBook}
+        orderBook={trade?.orderBook}
         currencyA={currencies[Field.CURRENCY_A]}
         currencyB={currencies[Field.CURRENCY_B]}
       />

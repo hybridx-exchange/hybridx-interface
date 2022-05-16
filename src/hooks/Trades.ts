@@ -1,4 +1,5 @@
 import {
+  CONFIG_ADDRESS,
   Currency,
   CurrencyAmount,
   JSBI,
@@ -13,8 +14,7 @@ import {
   TradeRet,
   TradeType,
   UserOrder,
-  ZERO,
-  CONFIG_ADDRESS
+  ZERO
 } from '@hybridx-exchange/hybridx-sdk'
 import flatMap from 'lodash.flatmap'
 import { useMemo } from 'react'
@@ -292,7 +292,11 @@ export function useSwapExactOut(currencyIn?: Currency, currencyAmountOut?: Curre
 /**
  * Returns the best trade for the token in to the exact amount of token out
  */
-export function useOrderBook(currencyIn?: Currency | undefined, currencyOut?: Currency | undefined): OrderBook | null {
+export function useOrderBook(
+  selectedType: TradeType,
+  currencyIn?: Currency | undefined,
+  currencyOut?: Currency | undefined
+): OrderBook | null {
   const { chainId } = useActiveWeb3React()
   const tokenIn = wrappedCurrency(currencyIn, chainId)
   const tokenOut = wrappedCurrency(currencyOut, chainId)
@@ -367,7 +371,7 @@ export function useOrderBook(currencyIn?: Currency | undefined, currencyOut?: Cu
       data: [price, buyPrices, buyAmounts, sellPrices, sellAmounts]
     } = returns[0]
     const {
-      data: [baseReserve, quoteReserve]
+      data: [reserveIn, reserveOut]
     } = returns[1]
     const {
       data: [baseTokenAddress]
@@ -388,25 +392,37 @@ export function useOrderBook(currencyIn?: Currency | undefined, currencyOut?: Cu
       ? baseTokenAddress.toLowerCase() === tokenIn?.address.toLowerCase()
         ? tokenIn
         : tokenOut
-      : tokenIn
+      : selectedType === TradeType.LIMIT_SELL
+      ? tokenIn
+      : tokenOut
     const quoteToken = baseTokenAddress
       ? baseTokenAddress.toLowerCase() === tokenIn?.address.toLowerCase()
         ? tokenOut
         : tokenIn
-      : tokenOut
+      : selectedType === TradeType.LIMIT_SELL
+      ? tokenOut
+      : tokenIn
     if (baseToken && quoteToken && priceStepFactor && priceStep) {
+      const baseReserve = baseTokenAddress
+        ? baseTokenAddress.toLowerCase() === tokenIn?.address.toLowerCase()
+          ? reserveIn
+          : reserveOut
+        : selectedType === TradeType.LIMIT_SELL
+        ? reserveOut
+        : reserveIn
+      const quoteReserve = baseTokenAddress
+        ? baseTokenAddress.toLowerCase() === tokenIn?.address.toLowerCase()
+          ? reserveOut
+          : reserveIn
+        : selectedType === TradeType.LIMIT_SELL
+        ? reserveIn
+        : reserveOut
       const baseAmount = wrappedCurrencyAmount(new TokenAmount(baseToken, baseReserve), baseToken.chainId)
       const quoteAmount = wrappedCurrencyAmount(new TokenAmount(quoteToken, quoteReserve), quoteToken.chainId)
       const exist = !price || price.eq(BigNumber.from(0)) ? false : true
       const curPrice = exist
         ? wrappedCurrencyAmount(new TokenAmount(quoteToken, price), quoteToken.chainId)
         : OrderBook.culPrice(baseAmount, quoteAmount)
-      console.log(
-        baseAmount?.toSignificant(6),
-        quoteAmount?.toSignificant(6),
-        price.toString(),
-        curPrice?.toSignificant(6)
-      )
 
       const buyOrders: Order[] = []
       for (let i = 0; i < buyPrices?.length; i++) {
@@ -439,7 +455,7 @@ export function useOrderBook(currencyIn?: Currency | undefined, currencyOut?: Cu
     }
 
     return null
-  }, [tokenIn, tokenOut, results])
+  }, [selectedType, tokenIn, tokenOut, results])
 }
 
 export function useTradeRet(
@@ -450,6 +466,7 @@ export function useTradeRet(
 ): TradeRet | null {
   const tokenIn = type === TradeType.LIMIT_BUY ? orderBook?.quoteToken : orderBook?.baseToken
   const tokenOut = type === TradeType.LIMIT_BUY ? orderBook?.baseToken : orderBook?.quoteToken
+
   const results = useMultipleContractMultipleData(
     [orderBook && amount && price && type ? ORDER_BOOK_ROUTER_ADDRESS : ''],
     [new Interface(IOrderBookRouterABI)],
