@@ -5,7 +5,7 @@ import {
   JSBI,
   Order,
   OrderBook,
-  Pair,
+  Pair, parseBigintIsh,
   Route,
   Swap,
   SwapType,
@@ -409,21 +409,22 @@ export function useOrderBook(
           ? reserveIn
           : reserveOut
         : selectedType === TradeType.LIMIT_SELL
-        ? reserveOut
-        : reserveIn
+        ? reserveIn
+        : reserveOut
       const quoteReserve = exist
         ? baseTokenAddress.toLowerCase() === tokenIn?.address.toLowerCase()
           ? reserveOut
           : reserveIn
         : selectedType === TradeType.LIMIT_SELL
-        ? reserveIn
-        : reserveOut
+        ? reserveOut
+        : reserveIn
       const baseAmount = wrappedCurrencyAmount(new TokenAmount(baseToken, baseReserve), baseToken.chainId)
       const quoteAmount = wrappedCurrencyAmount(new TokenAmount(quoteToken, quoteReserve), quoteToken.chainId)
       const curPrice = exist
         ? wrappedCurrencyAmount(new TokenAmount(quoteToken, price), quoteToken.chainId)
-        : OrderBook.culPrice(baseAmount, quoteAmount)
-
+        : baseReserve?.raw?.greaterThan(parseBigintIsh('0'))
+        ? OrderBook.culPrice(baseAmount, quoteAmount)
+        : undefined
       const buyOrders: Order[] = []
       for (let i = 0; i < buyPrices?.length; i++) {
         const buyPrice = wrappedCurrencyAmount(new TokenAmount(quoteToken, buyPrices[i]), quoteToken.chainId)
@@ -459,26 +460,22 @@ export function useOrderBook(
 }
 
 export function useTradeRet(
-  orderBook: OrderBook | null,
   type: TradeType | undefined,
+  tokenIn: Token | undefined,
+  tokenOut: Token | undefined,
   amount: CurrencyAmount | undefined,
   price: CurrencyAmount | undefined
 ): TradeRet | null {
-  const tokenIn = type === TradeType.LIMIT_BUY ? orderBook?.quoteToken : orderBook?.baseToken
-  const tokenOut = type === TradeType.LIMIT_BUY ? orderBook?.baseToken : orderBook?.quoteToken
+  const tokenBase = type === TradeType.LIMIT_BUY ? tokenOut : tokenIn
+  const tokenQuote = type === TradeType.LIMIT_BUY ? tokenIn : tokenOut
 
   const results = useMultipleContractMultipleData(
-    [orderBook && amount && price && type ? ORDER_BOOK_ROUTER_ADDRESS : ''],
+    [tokenIn && tokenOut && amount && price && type ? ORDER_BOOK_ROUTER_ADDRESS : ''],
     [new Interface(IOrderBookRouterABI)],
     [type === TradeType.LIMIT_BUY ? 'getAmountsForBuy' : 'getAmountsForSell'],
     [
       amount && price
-        ? [
-            amount.raw.toString(),
-            price.raw.toString(),
-            orderBook?.baseToken.token?.address,
-            orderBook?.quoteToken.token?.address
-          ]
+        ? [amount.raw.toString(), price.raw.toString(), tokenBase?.address, tokenQuote?.address]
         : [ZERO.toString(), ZERO.toString(), ZERO_ADDRESS, ZERO_ADDRESS]
     ]
   )
@@ -506,33 +503,44 @@ export function useTradeRet(
         priceToRaw
       ]
     } = returns[0].data
-
+    console.log(type, tokenBase, tokenQuote, tokenIn, tokenOut)
+    console.log(
+      ammAmountInRaw.toString(),
+      ammAmountOutRaw.toString(),
+      orderAmountInRaw.toString(),
+      orderAmountOutRaw.toString(),
+      orderFeeRaw.toString(),
+      amountLeftRaw.toString(),
+      amountExpectRaw.toString(),
+      priceToRaw.toString()
+    )
     const ammAmountIn = tokenIn
-      ? wrappedCurrencyAmount(new TokenAmount(tokenIn?.token, ammAmountInRaw), tokenIn?.token.chainId)
+      ? wrappedCurrencyAmount(new TokenAmount(tokenIn, ammAmountInRaw), tokenIn?.chainId)
       : undefined
     const ammAmountOut = tokenOut
-      ? wrappedCurrencyAmount(new TokenAmount(tokenOut?.token, ammAmountOutRaw), tokenOut?.token.chainId)
+      ? wrappedCurrencyAmount(new TokenAmount(tokenOut, ammAmountOutRaw), tokenOut?.chainId)
       : undefined
     const orderAmountIn = tokenIn
-      ? wrappedCurrencyAmount(new TokenAmount(tokenIn?.token, orderAmountInRaw), tokenIn?.token.chainId)
+      ? wrappedCurrencyAmount(new TokenAmount(tokenIn, orderAmountInRaw), tokenIn?.chainId)
       : undefined
     const orderAmountOut = tokenOut
-      ? wrappedCurrencyAmount(new TokenAmount(tokenOut?.token, orderAmountOutRaw), tokenOut?.token.chainId)
+      ? wrappedCurrencyAmount(new TokenAmount(tokenOut, orderAmountOutRaw), tokenOut?.chainId)
       : undefined
     const orderFee = tokenIn
-      ? wrappedCurrencyAmount(new TokenAmount(tokenIn?.token, orderFeeRaw), tokenIn?.token.chainId)
+      ? wrappedCurrencyAmount(new TokenAmount(tokenIn, orderFeeRaw), tokenIn?.chainId)
       : undefined
     const amountLeft = tokenIn
-      ? wrappedCurrencyAmount(new TokenAmount(tokenIn?.token, amountLeftRaw), tokenIn?.token.chainId)
+      ? wrappedCurrencyAmount(new TokenAmount(tokenIn, amountLeftRaw), tokenIn?.chainId)
       : undefined
     const amountExpect = tokenOut
-      ? wrappedCurrencyAmount(new TokenAmount(tokenOut?.token, amountExpectRaw), tokenOut?.token.chainId)
+      ? wrappedCurrencyAmount(new TokenAmount(tokenOut, amountExpectRaw), tokenOut?.chainId)
       : undefined
-    const priceTo = orderBook?.quoteToken
-      ? wrappedCurrencyAmount(new TokenAmount(orderBook?.quoteToken.token, priceToRaw), tokenOut?.token.chainId)
+    const priceTo = tokenQuote
+      ? wrappedCurrencyAmount(new TokenAmount(tokenQuote, priceToRaw), tokenQuote?.chainId)
       : undefined
     if (
-      orderBook &&
+      tokenIn &&
+      tokenOut &&
       ammAmountIn &&
       ammAmountOut &&
       orderAmountIn &&
@@ -543,7 +551,6 @@ export function useTradeRet(
       priceTo
     ) {
       return new TradeRet(
-        orderBook,
         ammAmountIn,
         ammAmountOut,
         orderAmountIn,
@@ -556,7 +563,7 @@ export function useTradeRet(
     }
 
     return null
-  }, [orderBook, results, tokenIn, tokenOut])
+  }, [tokenBase, tokenQuote, results, tokenIn, tokenOut])
 }
 
 export function useUserOrderIds(

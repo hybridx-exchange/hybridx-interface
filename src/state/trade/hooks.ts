@@ -128,6 +128,7 @@ export function useDerivedTradeInfo(
 
   const orderBook = useOrderBook(selectedType, currencyA ?? undefined, currencyB ?? undefined)
   const tokenIn = wrappedCurrency(currencyA, chainId)
+  const tokenOut = wrappedCurrency(currencyB, chainId)
   const baseToken = orderBook?.baseToken?.token
   const type = !orderBook?.exist
     ? selectedType
@@ -141,7 +142,7 @@ export function useDerivedTradeInfo(
 
   const parsedAmountAmount = tryParseAmount(typedAmountValue, currencyA)
   const parsedPriceAmount = tryParseAmount(typedPriceValue, orderBook?.quoteToken.currency)
-  const tradeRet = useTradeRet(orderBook, type, parsedAmountAmount, parsedPriceAmount)
+  const tradeRet = useTradeRet(type, tokenIn, tokenOut, parsedAmountAmount, parsedPriceAmount)
 
   // pair
   const [pairState, pair] = usePair(currencies[Field.CURRENCY_A], currencies[Field.CURRENCY_B])
@@ -153,7 +154,6 @@ export function useDerivedTradeInfo(
     if (currencies[Field.CURRENCY_A] && currencies[Field.CURRENCY_B]) {
       const baseToken = type === TradeType.LIMIT_SELL ? currencies[Field.CURRENCY_A] : currencies[Field.CURRENCY_B]
       const quoteToken = type !== TradeType.LIMIT_SELL ? currencies[Field.CURRENCY_A] : currencies[Field.CURRENCY_B]
-      console.log(wrappedCurrency(baseToken, chainId), orderBook?.baseToken.token)
       if (wrappedCurrency(baseToken, chainId) === orderBook?.baseToken.token) {
         return {
           orderBook: orderBook,
