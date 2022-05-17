@@ -23,6 +23,7 @@ export default function TradeModalFooter({
   const theme = useContext(ThemeContext)
   const inDecimal = trade?.orderBook.getMinAmountDecimal(trade?.tradeType)
   const outDecimal = trade?.orderBook.getMinOutputAmountDecimal(trade?.tradeType)
+  console.log(inDecimal, outDecimal)
   return (
     <>
       <AutoColumn gap="0px">

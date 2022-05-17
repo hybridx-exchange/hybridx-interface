@@ -503,7 +503,6 @@ export function useTradeRet(
         priceToRaw
       ]
     } = returns[0].data
-    console.log(type, tokenBase, tokenQuote, tokenIn, tokenOut)
     console.log(
       ammAmountInRaw.toString(),
       ammAmountOutRaw.toString(),
@@ -526,8 +525,8 @@ export function useTradeRet(
     const orderAmountOut = tokenOut
       ? wrappedCurrencyAmount(new TokenAmount(tokenOut, orderAmountOutRaw), tokenOut?.chainId)
       : undefined
-    const orderFee = tokenIn
-      ? wrappedCurrencyAmount(new TokenAmount(tokenIn, orderFeeRaw), tokenIn?.chainId)
+    const orderFee = tokenOut
+      ? wrappedCurrencyAmount(new TokenAmount(tokenOut, orderFeeRaw), tokenOut?.chainId)
       : undefined
     const amountLeft = tokenIn
       ? wrappedCurrencyAmount(new TokenAmount(tokenIn, amountLeftRaw), tokenIn?.chainId)
