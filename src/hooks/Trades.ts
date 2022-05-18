@@ -5,7 +5,8 @@ import {
   JSBI,
   Order,
   OrderBook,
-  Pair, parseBigintIsh,
+  Pair,
+  parseBigintIsh,
   Route,
   Swap,
   SwapType,
@@ -36,6 +37,7 @@ import { abi as IPairUtilsABI } from '@hybridx-exchange/hybridx-protocol/build/I
 import { abi as IConfigABI } from '@hybridx-exchange/hybridx-protocol/build/IConfig.json'
 import { abi as IOrderBookRouterABI } from '@hybridx-exchange/hybridx-protocol/build/IOrderBookRouter.json'
 import { abi as IOrderBookABI } from '@hybridx-exchange/hybridx-protocol/build/IOrderBook.json'
+import { abi as IOrderNFTABI } from '@hybridx-exchange/hybridx-protocol/build/IOrderNFT.json'
 import { Interface } from '@ethersproject/abi'
 import { useUserSingleHopOnly } from '../state/user/hooks'
 import { BigNumber } from 'ethers'
@@ -562,105 +564,103 @@ export function useTradeRet(
     }
 
     return null
-  }, [tokenBase, tokenQuote, results, tokenIn, tokenOut])
+  }, [tokenQuote, results, tokenIn, tokenOut])
 }
 
-export function useUserOrderIds(
-  account: string | undefined,
-  trackedTokensAndOrderBookAddresses: (Token | string)[][]
-): { selectOrderBooks: (Token | string)[][]; userOrderIds: string[] } {
+export function useUserOrders(selectPairAndAddress: (Token | string)[][], account: string | undefined): UserOrder[] {
   const orderBookInterface = new Interface(IOrderBookABI)
-  const orderBookAddresses = trackedTokensAndOrderBookAddresses.map(e => e[2].toString())
-  const results = useMultipleContractSingleData(orderBookAddresses, orderBookInterface, 'getUserOrders', [account])
-  return useMemo(() => {
-    const allOrderIds: string[] = []
-    const selectOrderBooks: (Token | string)[][] = []
-    for (let i = 0; i < results.length; i++) {
-      const { result, loading } = results[i]
-      if (loading || !result || result.length === 0) continue
-      const orderIds = result[0]
-      const length = orderIds ? orderIds.length : 0
-      for (let j = 0; j < length; j++) {
-        const orderId = orderIds ? orderIds[j].toString() : undefined
-        if (orderId) {
-          allOrderIds.push(orderId)
-          selectOrderBooks.push(trackedTokensAndOrderBookAddresses[i])
-        }
-      }
-    }
-    return { selectOrderBooks: selectOrderBooks, userOrderIds: allOrderIds }
-  }, [results, trackedTokensAndOrderBookAddresses])
-}
+  const orderNFTInterface = new Interface(IOrderNFTABI)
+  const orderNFTAddresses = selectPairAndAddress.map(e => e[3].toString())
+  let results = useMultipleContractSingleData(orderNFTAddresses, orderNFTInterface, 'getUserOrders', [
+    account ?? ZERO_ADDRESS
+  ])
 
-export function useUserOrders(selectOrderBooks: (Token | string)[][], userOrderIds: string[]): UserOrder[] {
-  const orderBookInterface = new Interface(IOrderBookABI)
-  const orderBookAddresses = selectOrderBooks
-    .map(e => e[2].toString())
-    .concat(selectOrderBooks.map(e => e[2].toString()))
-  //console.log('address:', orderBookAddresses)
-  const orderBookInterfaces = userOrderIds
-    .map(e => orderBookInterface)
-    .concat(userOrderIds.map(e => orderBookInterface))
-  //console.log('interfaces:', orderBookInterfaces)
-  const methodNames = userOrderIds.map(e => 'marketOrder').concat(userOrderIds.map(e => 'quoteToken'))
-  //console.log('methods:', methodNames)
-  const callInputs = userOrderIds.map(e => [e]).concat(userOrderIds.map(e => []))
-  //console.log('inputs:', callInputs)
-  const results = useMultipleContractMultipleData(orderBookAddresses, orderBookInterfaces, methodNames, callInputs)
-  return useMemo(() => {
+  const [hitPairAndAddress, hitOrderBookAddress, ids, orders] = useMemo(() => {
     const returns = results?.map(result => {
       if (!result || result.loading) return { data: null, loading: result.loading }
       const { result: data, loading } = result
       return { data, loading }
     })
 
-    //console.log('returns:', returns)
-    if (!returns || returns.length === 0 || returns[0].loading || returns.length !== userOrderIds.length * 2) {
+    if (!returns || returns.length === 0 || returns[0].loading) {
+      return [[], [], [], []]
+    }
+
+    const addresses: (Token | string)[][] = []
+    const ids: any[] = []
+    const orders: any[] = []
+    for (let i = 0; i < returns.length; i++) {
+      const retData = returns[i].data ?? [[], []]
+      const id = retData[0]
+      const data = retData[1]
+      if (id.length > 0 && data.length > 0) {
+        addresses.push(selectPairAndAddress[i])
+        ids.push(id)
+        orders.push(data)
+      }
+    }
+    const hitOrderBookAddress = addresses.map(e => e[2].toString())
+    return [addresses, hitOrderBookAddress, ids, orders]
+  }, [results, selectPairAndAddress])
+
+  //console.log(hitOrderBookAddress, ids, orders)
+  results = useMultipleContractSingleData(hitOrderBookAddress, orderBookInterface, 'quoteToken', [])
+  return useMemo(() => {
+    const returns = results?.map(res => {
+      if (!res || res.loading) return { result: null, loading: res.loading }
+      //console.log(res)
+      return res
+    })
+
+    if (!returns || returns.length === 0 || returns[0].loading || returns.length !== hitPairAndAddress.length) {
       return []
     }
 
     const userOrders: UserOrder[] = []
-    for (let i = 0; i < userOrderIds.length; i++) {
-      const order = returns[i].data ?? []
-      if (order.length === 0) continue
-      const [owner, orderId, price, amountOffer, amountRemain, orderType, orderIndex] = order[0]
-      //console.log('order:', owner, to, orderId, price, amountOffer, amountRemain, orderType, orderIndex)
-      const quoteAddress = returns[userOrderIds.length + i].data?.toString()
-      //console.log('quote:', quoteAddress)
-      const quoteToken =
-        quoteAddress?.toLowerCase() === (selectOrderBooks[i][0] as Token).address.toLowerCase()
-          ? (selectOrderBooks[i][0] as Token)
-          : (selectOrderBooks[i][1] as Token)
-      const baseToken =
-        quoteToken === (selectOrderBooks[i][0] as Token)
-          ? (selectOrderBooks[i][1] as Token)
-          : (selectOrderBooks[i][0] as Token)
-      const type = orderType.toString() === TradeType.LIMIT_BUY.toString() ? TradeType.LIMIT_BUY : TradeType.LIMIT_SELL
-      const amountRemainAmount =
-        type === TradeType.LIMIT_BUY
-          ? new TokenAmount(quoteToken, amountRemain)
-          : new TokenAmount(baseToken, amountRemain)
-      const amountOfferAmount =
-        type === TradeType.LIMIT_BUY
-          ? new TokenAmount(quoteToken, amountOffer)
-          : new TokenAmount(baseToken, amountOffer)
-      const priceAmount = new TokenAmount(quoteToken, price)
-      userOrders.push({
-        amountLeft: amountRemainAmount,
-        amountOffer: amountOfferAmount,
-        orderId: orderId,
-        orderIndex: orderIndex,
-        orderType: type,
-        owner: '0x' + JSBI.BigInt(owner).toString(16),
-        price: priceAmount,
-        orderBook: orderBookAddresses[i],
-        baseToken: baseToken,
-        quoteToken: quoteToken
-      })
+    for (let n = 0; n < ids.length; n++) {
+      for (let i = 0; i < ids[n].length; i++) {
+        const orderId = ids[n][i]
+        const [price, amountOffer, amountRemain, orderType] = orders[n][i]
+        const orderIndex = i + ''
+        const owner = account ?? ZERO_ADDRESS
+        //console.log('order:', owner, orderId, price, amountOffer, amountRemain, orderType, orderIndex)
+        const quoteAddress = returns[n].result?.toString()
+        const quoteToken =
+          quoteAddress?.toLowerCase() === (hitPairAndAddress[n][0] as Token).address.toLowerCase()
+            ? (hitPairAndAddress[n][0] as Token)
+            : (hitPairAndAddress[n][1] as Token)
+        const baseToken =
+          quoteToken === (hitPairAndAddress[n][0] as Token)
+            ? (hitPairAndAddress[n][1] as Token)
+            : (hitPairAndAddress[n][0] as Token)
+        const type =
+          orderType.toString() === TradeType.LIMIT_BUY.toString() ? TradeType.LIMIT_BUY : TradeType.LIMIT_SELL
+        const amountRemainAmount =
+          type === TradeType.LIMIT_BUY
+            ? new TokenAmount(quoteToken, amountRemain)
+            : new TokenAmount(baseToken, amountRemain)
+        const amountOfferAmount =
+          type === TradeType.LIMIT_BUY
+            ? new TokenAmount(quoteToken, amountOffer)
+            : new TokenAmount(baseToken, amountOffer)
+        const priceAmount = new TokenAmount(quoteToken, price)
+        userOrders.push({
+          amountLeft: amountRemainAmount,
+          amountOffer: amountOfferAmount,
+          orderId: orderId,
+          orderIndex: orderIndex,
+          orderType: type,
+          owner: '0x' + JSBI.BigInt(owner).toString(16),
+          price: priceAmount,
+          orderBook: hitPairAndAddress[n][2] as string,
+          baseToken: baseToken,
+          quoteToken: quoteToken
+        })
+      }
     }
 
     return userOrders
-  }, [selectOrderBooks, orderBookAddresses, userOrderIds, results])
+  }, [account, hitPairAndAddress, ids, orders, results])
 }
 
 export function useUserOrder(
@@ -668,7 +668,8 @@ export function useUserOrder(
   tokenB: Token | undefined,
   orderId: string | undefined
 ): UserOrder | null {
-  const orderBookAddress = tokenA && tokenB ? OrderBook.getAddress(tokenA as Token, tokenB as Token) : ''
-  const userOrders = useUserOrders([[tokenA as Token, tokenB as Token, orderBookAddress]], [orderId ?? ''])
-  return userOrders.length > 0 ? userOrders[0] : null
+  //const orderBookAddress = tokenA && tokenB ? OrderBook.getAddress(tokenA as Token, tokenB as Token) : ''
+  //const userOrders = useUserOrders([[tokenA as Token, tokenB as Token, orderBookAddress]], [orderId ?? ''])
+  //return userOrders.length > 0 ? userOrders[0] : null
+  return null
 }

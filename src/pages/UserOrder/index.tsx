@@ -13,7 +13,7 @@ import { AutoColumn } from '../../components/Column'
 import { useActiveWeb3React } from '../../hooks'
 import { useTrackedTokenPairs } from '../../state/user/hooks'
 import AppBody from '../AppBody'
-import { useUserOrderIds, useUserOrders } from '../../hooks/Trades'
+import { useUserOrders } from '../../hooks/Trades'
 import FullOrderCard from '../../components/OrderCard'
 import CurrencySelectPanel from '../../components/CurrencySelectPanel'
 import { wrappedCurrency } from '../../utils/wrappedCurrency'
@@ -35,17 +35,19 @@ export default function DoUserOrder() {
 
   // fetch the user's balances of all tracked V2 LP tokens
   const trackedTokenPairs = useTrackedTokenPairs()
-  const trackedTokenPairsAndOrderBookAddresses = useMemo(
-    () => trackedTokenPairs.map(tokens => [tokens[0], tokens[1], OrderBook.getAddress(tokens[0], tokens[1])]),
+  const trackedTokenPairsAndOrderAddresses = useMemo(
+    () =>
+      trackedTokenPairs.map(tokens => [
+        tokens[0],
+        tokens[1],
+        OrderBook.getAddress(tokens[0], tokens[1]),
+        OrderBook.getNFTAddress(tokens[0], tokens[1])
+      ]),
     [trackedTokenPairs]
   )
 
-  const { selectOrderBooks, userOrderIds } = useUserOrderIds(
-    account ?? undefined,
-    trackedTokenPairsAndOrderBookAddresses
-  )
   //console.log('selectOrderBooks:', selectOrderBooks, 'userOrderIds:', userOrderIds)
-  const userOrders = useUserOrders(selectOrderBooks, userOrderIds)
+  const userOrders = useUserOrders(trackedTokenPairsAndOrderAddresses, account ?? undefined)
 
   const handleTokenASelect = useCallback(
     (currency: Currency) => {
