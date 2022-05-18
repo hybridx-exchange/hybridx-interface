@@ -16,7 +16,7 @@ export function useDerivedCancelOrderInfo(
 
   const [tokenA, tokenB] = [wrappedCurrency(currencyA, chainId), wrappedCurrency(currencyB, chainId)]
 
-  const userOrder = useUserOrder(tokenA, tokenB, orderId)
+  const userOrder = useUserOrder(tokenA, tokenB, account ?? undefined, orderId)
 
   let error: string | undefined
   if (!account) {
