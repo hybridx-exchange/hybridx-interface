@@ -69,7 +69,7 @@ export default function RemoveOrder({
     }
 
     const methodNames = ['cancelLimitOrder']
-    const args = [orderId]
+    const args = [account, orderId]
     const safeGasEstimates: (BigNumber | undefined)[] = await Promise.all(
       methodNames.map(methodName =>
         orderBookContract?.estimateGas[methodName](...args)

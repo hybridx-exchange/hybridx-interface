@@ -655,7 +655,7 @@ export function useUserOrders(selectPairAndAddress: (Token | string)[][], accoun
           orderId: orderId,
           orderIndex: orderIndex,
           orderType: type,
-          owner: '0x' + JSBI.BigInt(owner).toString(16),
+          owner: owner,
           price: priceAmount,
           orderBook: hitPairAndAddress[n][2] as string,
           baseToken: baseToken,
@@ -677,7 +677,6 @@ export function useUserOrder(tokenA: Token | undefined, tokenB: Token | undefine
   const orderResults = useSingleCallResult(orderNFTContract, 'get', [orderId])
   const ownerResults = useSingleCallResult(orderNFTContract, 'ownerOf', [orderId])
   return useMemo(() => {
-    console.log(quoteTokenResults, orderResults, ownerResults)
     const quoteAddress = quoteTokenResults.result ? quoteTokenResults.result[0] : undefined
     const order = orderResults.result?.order
     const owner = ownerResults.result ? ownerResults.result[0] : undefined
@@ -718,5 +717,5 @@ export function useUserOrder(tokenA: Token | undefined, tokenB: Token | undefine
       }
     }
     return null
-  }, [orderResults])
+  }, [orderBookAddress, orderId, ownerResults, quoteTokenResults, tokenA, tokenB, orderResults])
 }
