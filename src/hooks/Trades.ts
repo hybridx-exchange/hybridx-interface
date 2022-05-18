@@ -32,7 +32,11 @@ import { PairState, usePairs } from '../data/Reserves'
 import { wrappedCurrency, wrappedCurrencyAmount } from '../utils/wrappedCurrency'
 
 import { useActiveWeb3React } from './index'
-import { useMultipleContractMultipleData, useMultipleContractSingleData } from '../state/multicall/hooks'
+import {
+  useMultipleContractMultipleData,
+  useMultipleContractSingleData,
+  useSingleCallResult
+} from '../state/multicall/hooks'
 import { abi as IPairUtilsABI } from '@hybridx-exchange/hybridx-protocol/build/IPairUtils.json'
 import { abi as IConfigABI } from '@hybridx-exchange/hybridx-protocol/build/IConfig.json'
 import { abi as IOrderBookRouterABI } from '@hybridx-exchange/hybridx-protocol/build/IOrderBookRouter.json'
@@ -41,6 +45,7 @@ import { abi as IOrderNFTABI } from '@hybridx-exchange/hybridx-protocol/build/IO
 import { Interface } from '@ethersproject/abi'
 import { useUserSingleHopOnly } from '../state/user/hooks'
 import { BigNumber } from 'ethers'
+import { useOrderBookContract, useOrderNFTContract } from './useContract'
 
 function useAllCommonPairs(currencyA?: Currency, currencyB?: Currency): Pair[] {
   const { chainId } = useActiveWeb3React()
@@ -663,13 +668,55 @@ export function useUserOrders(selectPairAndAddress: (Token | string)[][], accoun
   }, [account, hitPairAndAddress, ids, orders, results])
 }
 
-export function useUserOrder(
-  tokenA: Token | undefined,
-  tokenB: Token | undefined,
-  orderId: string | undefined
-): UserOrder | null {
-  //const orderBookAddress = tokenA && tokenB ? OrderBook.getAddress(tokenA as Token, tokenB as Token) : ''
-  //const userOrders = useUserOrders([[tokenA as Token, tokenB as Token, orderBookAddress]], [orderId ?? ''])
-  //return userOrders.length > 0 ? userOrders[0] : null
-  return null
+export function useUserOrder(tokenA: Token | undefined, tokenB: Token | undefined, orderId: string): UserOrder | null {
+  const orderBookAddress = tokenA && tokenB ? OrderBook.getAddress(tokenA as Token, tokenB as Token) : undefined
+  const orderNFTAddress = tokenA && tokenB ? OrderBook.getNFTAddress(tokenA as Token, tokenB as Token) : undefined
+  const orderBookContract = useOrderBookContract(orderBookAddress)
+  const orderNFTContract = useOrderNFTContract(orderNFTAddress)
+  const quoteTokenResults = useSingleCallResult(orderBookContract, 'quoteToken', [])
+  const orderResults = useSingleCallResult(orderNFTContract, 'get', [orderId])
+  const ownerResults = useSingleCallResult(orderNFTContract, 'ownerOf', [orderId])
+  return useMemo(() => {
+    console.log(quoteTokenResults, orderResults, ownerResults)
+    const quoteAddress = quoteTokenResults.result ? quoteTokenResults.result[0] : undefined
+    const order = orderResults.result?.order
+    const owner = ownerResults.result ? ownerResults.result[0] : undefined
+    if (
+      tokenA &&
+      tokenB &&
+      orderBookAddress &&
+      owner &&
+      !quoteTokenResults.loading &&
+      quoteAddress &&
+      !orderResults.loading &&
+      order
+    ) {
+      const [price, amountOffer, amountRemain, orderType] = order
+      const quoteToken = quoteAddress?.toLowerCase() === tokenA?.address.toLowerCase() ? tokenA : tokenB
+      const baseToken = quoteToken === tokenA ? tokenB : tokenA
+      const type = orderType.toString() === TradeType.LIMIT_BUY.toString() ? TradeType.LIMIT_BUY : TradeType.LIMIT_SELL
+      const amountRemainAmount =
+        type === TradeType.LIMIT_BUY
+          ? new TokenAmount(quoteToken, amountRemain)
+          : new TokenAmount(baseToken, amountRemain)
+      const amountOfferAmount =
+        type === TradeType.LIMIT_BUY
+          ? new TokenAmount(quoteToken, amountOffer)
+          : new TokenAmount(baseToken, amountOffer)
+      const priceAmount = new TokenAmount(quoteToken, price)
+      return {
+        amountLeft: amountRemainAmount,
+        amountOffer: amountOfferAmount,
+        orderId: orderId,
+        orderIndex: '0',
+        orderType: type,
+        owner: owner,
+        price: priceAmount,
+        orderBook: orderBookAddress,
+        baseToken: baseToken,
+        quoteToken: quoteToken
+      }
+    }
+    return null
+  }, [orderResults])
 }

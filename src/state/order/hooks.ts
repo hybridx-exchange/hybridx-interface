@@ -7,7 +7,7 @@ import { useUserOrder } from '../../hooks/Trades'
 export function useDerivedCancelOrderInfo(
   currencyA: Currency | undefined,
   currencyB: Currency | undefined,
-  orderId: string | undefined
+  orderId: string
 ): {
   userOrder?: UserOrder | null
   error?: string

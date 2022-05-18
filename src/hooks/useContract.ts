@@ -2,6 +2,7 @@ import { Contract } from '@ethersproject/contracts'
 import { ChainId, WETH } from '@hybridx-exchange/hybridx-sdk'
 import { abi as IPairABI } from '@hybridx-exchange/hybridx-protocol/build/IPair.json'
 import { abi as IOrderBookABI } from '@hybridx-exchange/hybridx-protocol/build/IOrderBook.json'
+import { abi as IOrderNFTABI } from '@hybridx-exchange/hybridx-protocol/build/IOrderNFT.json'
 import { abi as IOrderBookFactoryABI } from '@hybridx-exchange/hybridx-protocol/build/IOrderBookFactory.json'
 import { abi as IOrderBookRouterABI } from '@hybridx-exchange/hybridx-protocol/build/IOrderBookRouter.json'
 import { abi as IPairRouterABI } from '@hybridx-exchange/hybridx-protocol/build/IPairRouter.json'
@@ -74,6 +75,10 @@ export function usePairRouterContract(routerAddress?: string, withSignerIfPossib
 
 export function useOrderBookContract(orderBookAddress?: string, withSignerIfPossible?: boolean): Contract | null {
   return useContract(orderBookAddress, IOrderBookABI, withSignerIfPossible)
+}
+
+export function useOrderNFTContract(orderNFTAddress?: string, withSignerIfPossible?: boolean): Contract | null {
+  return useContract(orderNFTAddress, IOrderNFTABI, withSignerIfPossible)
 }
 
 export function useOrderBookFactoryContract(withSignerIfPossible?: boolean): Contract | null {

@@ -39,7 +39,7 @@ export default function RemoveOrder({
   // toggle wallet when disconnected
   const toggleWalletModal = useWalletModalToggle()
 
-  const { userOrder, error } = useDerivedCancelOrderInfo(currencyA ?? undefined, currencyB ?? undefined, orderId)
+  const { userOrder, error } = useDerivedCancelOrderInfo(currencyA ?? undefined, currencyB ?? undefined, orderId ?? '0')
   const isValid = !error
 
   // modal and loading
