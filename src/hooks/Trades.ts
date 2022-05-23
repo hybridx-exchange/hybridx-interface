@@ -40,7 +40,7 @@ import { abi as IOrderBookABI } from '@hybridx-exchange/hybridx-protocol/build/I
 import { abi as IOrderNFTABI } from '@hybridx-exchange/hybridx-protocol/build/IOrderNFT.json'
 import { Interface } from '@ethersproject/abi'
 import { useUserSingleHopOnly } from '../state/user/hooks'
-import { BigNumber } from "ethers";
+import { BigNumber } from 'ethers'
 
 function useAllCommonPairs(currencyA?: Currency, currencyB?: Currency): Pair[] {
   const { chainId } = useActiveWeb3React()
@@ -143,10 +143,10 @@ export function useGetBestOutputAmount(
     const returns = results?.map(result => {
       if (!result || !result.result || result.loading) return { data: null, loading: result.loading }
       const {
-        result: [path, amounts, nextReserves],
+        result: [path, amounts, extra],
         loading
       } = result
-      return { data: { path, amounts, nextReserves }, loading: loading }
+      return { data: { path, amounts, extra }, loading: loading }
     })
 
     if (!returns || returns.length === 0 || returns[0].loading) {
@@ -156,7 +156,16 @@ export function useGetBestOutputAmount(
     const data = returns[0].data
     const path = data && data.path ? data.path : []
     const amounts = data && data.amounts ? data.amounts : []
-    const nextReserves = data && data.nextReserves ? data.nextReserves : []
+    const extra = data && data.extra ? data.extra : []
+    /*nextReserves.length > 0 &&
+      console.log(
+        nextReserves[0].toString(),
+        nextReserves[1].toString(),
+        nextReserves[2].toString(),
+        nextReserves[3].toString(),
+        nextReserves[4].toString(),
+        nextReserves[5].toString()
+      )*/
     const pairs: Pair[] = []
     for (let i = 1; i < path?.length; i++) {
       if (allPairs) {
@@ -175,7 +184,7 @@ export function useGetBestOutputAmount(
       return {
         loading: false,
         bestSwap: new Swap(
-          new Route(pairs, amounts, nextReserves, currencyAmountIn.currency, currencyOut),
+          new Route(pairs, amounts, extra, currencyAmountIn.currency, currencyOut),
           currencyAmountIn,
           SwapType.EXACT_INPUT
         )
@@ -215,10 +224,10 @@ export function useGetBestInputAmount(
     const returns = results?.map(result => {
       if (!result || !result.result || result.loading || !result.result) return { data: null, loading: result.loading }
       const {
-        result: [path, amounts, nextReserves],
+        result: [path, amounts, extra],
         loading
       } = result
-      return { data: { path, amounts, nextReserves }, loading: loading }
+      return { data: { path, amounts, extra }, loading: loading }
     })
 
     if (!returns || returns.length === 0 || returns[0].loading) {
@@ -228,7 +237,16 @@ export function useGetBestInputAmount(
     const data = returns[0].data
     const path = data && data.path ? data.path : []
     const amounts = data && data.amounts ? data.amounts : []
-    const nextReserves = data && data.nextReserves ? data.nextReserves : []
+    const extra = data && data.extra ? data.extra : []
+    /*nextReserves.length > 0 &&
+      console.log(
+        nextReserves[0].toString(),
+        nextReserves[1].toString(),
+        nextReserves[2].toString(),
+        nextReserves[3].toString(),
+        nextReserves[4].toString(),
+        nextReserves[5].toString()
+      )*/
     const pairs: Pair[] = []
     for (let i = 1; i < path?.length; i++) {
       if (allPairs) {
@@ -247,7 +265,7 @@ export function useGetBestInputAmount(
       return {
         loading: false,
         bestSwap: new Swap(
-          new Route(pairs, amounts, nextReserves, currencyIn, currencyAmountOut.currency),
+          new Route(pairs, amounts, extra, currencyIn, currencyAmountOut.currency),
           currencyAmountOut,
           SwapType.EXACT_OUTPUT
         )
