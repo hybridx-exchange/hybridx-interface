@@ -11,7 +11,6 @@ import { RowBetween, RowFixed } from '../Row'
 import FormattedPriceImpact from './FormattedPriceImpact'
 import { SectionBreak } from './styleds'
 import SwapRoute from './SwapRoute'
-import AmountsFlow from './AmountsFlow'
 
 function TradeSummary({ swap, allowedSlippage }: { swap: Swap; allowedSlippage: number }) {
   const theme = useContext(ThemeContext)
@@ -95,19 +94,6 @@ export function AdvancedSwapDetails({ swap }: AdvancedSwapDetailsProps) {
               </AutoColumn>
             </>
           )}
-          {
-            <>
-              <AutoColumn style={{ padding: '0 24px' }}>
-                <RowFixed>
-                  <TYPE.black fontSize={14} fontWeight={400} color={theme.text2}>
-                    Funds Flow
-                  </TYPE.black>
-                  <QuestionHelper text="The flow of funds in the AMM and order book during the transaction." />
-                </RowFixed>
-                <AmountsFlow swap={swap} />
-              </AutoColumn>
-            </>
-          }
         </>
       )}
     </AutoColumn>

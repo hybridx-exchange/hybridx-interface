@@ -46,7 +46,7 @@ function useAllCommonPairs(currencyA?: Currency, currencyB?: Currency): Pair[] {
   const { chainId } = useActiveWeb3React()
 
   const bases: Token[] = chainId ? BASES_TO_CHECK_TRADES_AGAINST[chainId] : []
-
+  //console.log('bases', bases)
   const [tokenA, tokenB] = chainId
     ? [wrappedCurrency(currencyA, chainId), wrappedCurrency(currencyB, chainId)]
     : [undefined, undefined]
@@ -58,7 +58,7 @@ function useAllCommonPairs(currencyA?: Currency, currencyB?: Currency): Pair[] {
       ),
     [bases]
   )
-
+  //console.log('base pair', basePairs)
   const allPairCombinations: [Token, Token][] = useMemo(
     () =>
       tokenA && tokenB
@@ -149,6 +149,8 @@ export function useGetBestOutputAmount(
       return { data: { path, amounts, extra }, loading: loading }
     })
 
+    //console.log(returns)
+
     if (!returns || returns.length === 0 || returns[0].loading) {
       return { loading: true, bestSwap: null }
     }
@@ -157,14 +159,14 @@ export function useGetBestOutputAmount(
     const path = data && data.path ? data.path : []
     const amounts = data && data.amounts ? data.amounts : []
     const extra = data && data.extra ? data.extra : []
-    /*nextReserves.length > 0 &&
+    /*extra.length > 0 &&
       console.log(
-        nextReserves[0].toString(),
-        nextReserves[1].toString(),
-        nextReserves[2].toString(),
-        nextReserves[3].toString(),
-        nextReserves[4].toString(),
-        nextReserves[5].toString()
+        extra[0].toString(),
+        extra[1].toString(),
+        extra[2].toString(),
+        extra[3].toString(),
+        extra[4].toString(),
+        extra[5].toString()
       )*/
     const pairs: Pair[] = []
     for (let i = 1; i < path?.length; i++) {
@@ -238,14 +240,14 @@ export function useGetBestInputAmount(
     const path = data && data.path ? data.path : []
     const amounts = data && data.amounts ? data.amounts : []
     const extra = data && data.extra ? data.extra : []
-    /*nextReserves.length > 0 &&
+    /*extra.length > 0 &&
       console.log(
-        nextReserves[0].toString(),
-        nextReserves[1].toString(),
-        nextReserves[2].toString(),
-        nextReserves[3].toString(),
-        nextReserves[4].toString(),
-        nextReserves[5].toString()
+        extra[0].toString(),
+        extra[1].toString(),
+        extra[2].toString(),
+        extra[3].toString(),
+        extra[4].toString(),
+        extra[5].toString()
       )*/
     const pairs: Pair[] = []
     for (let i = 1; i < path?.length; i++) {

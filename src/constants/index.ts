@@ -4,9 +4,10 @@ import { AbstractConnector } from '@web3-react/abstract-connector'
 //import { fortmatic, injected, portis, walletconnect, walletlink } from '../connectors'
 import { injected /*, walletconnect*/ } from '../connectors'
 
-export const PAIR_ROUTER_ADDRESS = '0x837fe8aBf4411d8CEf08e80Ee61E8f71f242465f'
-export const PAIR_UTILS_ADDRESS = '0xBCC696b1750119414b1D1dA1Ab40e0F5340764c0'
-export const ORDER_BOOK_ROUTER_ADDRESS = '0xA9B6D3AA0b7D5Ebe75e68c96Be8F9CE4E695eD1f'
+export const PAIR_ROUTER_ADDRESS = '0x087C4EF6BD07942fB4bBe8b48A16075Eb509f8f7'
+export const PAIR_UTILS_ADDRESS = '0x318e48b65320C31f33D9cab11d41dC1eAbB01737'
+export const ORDER_BOOK_ROUTER_ADDRESS = '0x6AFE10b6f29dC0760941d74491d65Ed0711767d6'
+
 export const DEFAULT_LIMIT_SIZE = 8
 export const ZERO_ADDRESS = '0x0000000000000000000000000000000000000000'
 
@@ -16,6 +17,7 @@ type ChainTokenList = {
 }
 
 export const USDC = new Token(ChainId.MAINNET, '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48', 6, 'USDC', 'USD//C')
+export const OUSD = new Token(ChainId.TESTNET, '0x1a56ED83b3773f662Fe2C471F6a3952432a4CFCd', 6, 'OUSD', 'OUSD')
 
 const WETH_ONLY: ChainTokenList = {
   [ChainId.MAINNET]: [WETH[ChainId.MAINNET]],
@@ -25,7 +27,8 @@ const WETH_ONLY: ChainTokenList = {
 // used to construct intermediary pairs for trading
 export const BASES_TO_CHECK_TRADES_AGAINST: ChainTokenList = {
   ...WETH_ONLY,
-  [ChainId.MAINNET]: [...WETH_ONLY[ChainId.MAINNET]]
+  [ChainId.MAINNET]: [...WETH_ONLY[ChainId.MAINNET]],
+  [ChainId.TESTNET]: [...WETH_ONLY[ChainId.TESTNET], OUSD]
 }
 
 /**

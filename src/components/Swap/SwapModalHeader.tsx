@@ -1,4 +1,4 @@
-import { Swap, SwapType } from '@hybridx-exchange/hybridx-sdk'
+import { Swap, SwapType, TokenAmount } from '@hybridx-exchange/hybridx-sdk'
 import React, { useContext, useMemo } from 'react'
 import { ArrowDown, AlertTriangle } from 'react-feather'
 import { Text } from 'rebass'
@@ -34,52 +34,71 @@ export default function SwapModalHeader({
   const priceImpactSeverity = warningSeverity(priceImpactWithoutFee)
 
   const theme = useContext(ThemeContext)
-
+  const extra = swap?.route?.extra
+  const path = swap?.route?.path
+  const flow = []
+  for (let i = 0; i < path?.length - 1; i++) {
+    flow.push([new TokenAmount(path[i], extra[i * 6 + 2]), new TokenAmount(path[i], extra[i * 6 + 2])])
+    flow.push([new TokenAmount(path[i + 1], extra[i * 6 + 3]), new TokenAmount(path[i + 1], extra[i * 6 + 4])])
+  }
+  console.log(flow)
   return (
     <AutoColumn gap={'md'} style={{ marginTop: '20px' }}>
-      <RowBetween align="flex-end">
-        <RowFixed gap={'0px'}>
-          <CurrencyLogo currency={swap.inputAmount.currency} size={'24px'} style={{ marginRight: '12px' }} />
-          <TruncatedText
-            fontSize={24}
-            fontWeight={500}
-            color={showAcceptChanges && swap.swapType === SwapType.EXACT_OUTPUT ? theme.primary1 : ''}
-          >
-            {swap.inputAmount.toSignificant(6)}
-          </TruncatedText>
-        </RowFixed>
-        <RowFixed gap={'0px'}>
-          <Text fontSize={24} fontWeight={500} style={{ marginLeft: '10px' }}>
-            {swap.inputAmount.currency.symbol}
-          </Text>
-        </RowFixed>
-      </RowBetween>
-      <RowFixed>
-        <ArrowDown size="16" color={theme.text2} style={{ marginLeft: '4px', minWidth: '16px' }} />
-      </RowFixed>
-      <RowBetween align="flex-end">
-        <RowFixed gap={'0px'}>
-          <CurrencyLogo currency={swap.outputAmount.currency} size={'24px'} style={{ marginRight: '12px' }} />
-          <TruncatedText
-            fontSize={24}
-            fontWeight={500}
-            color={
-              priceImpactSeverity > 2
-                ? theme.red1
-                : showAcceptChanges && swap.swapType === SwapType.EXACT_INPUT
-                ? theme.primary1
-                : ''
-            }
-          >
-            {swap.outputAmount.toSignificant(6)}
-          </TruncatedText>
-        </RowFixed>
-        <RowFixed gap={'0px'}>
-          <Text fontSize={24} fontWeight={500} style={{ marginLeft: '10px' }}>
-            {swap.outputAmount.currency.symbol}
-          </Text>
-        </RowFixed>
-      </RowBetween>
+      {flow.forEach((e, i, flow) => {
+        const isLastItem: boolean = i === flow.length - 1
+        return (
+          <>
+            {!isLastItem ? (
+              <RowBetween align="flex-end">
+                <RowFixed gap={'0px'}>
+                  <CurrencyLogo currency={e[0].currency} size={'24px'} style={{ marginRight: '12px' }} />
+                  <TruncatedText
+                    fontSize={24}
+                    fontWeight={500}
+                    color={showAcceptChanges && swap.swapType === SwapType.EXACT_OUTPUT ? theme.primary1 : ''}
+                  >
+                    {e[0].add(e[1]).toSignificant(6) + '[' + e[0].toSignificant(6) + '|' + e[1].toSignificant(6) + ']'}
+                  </TruncatedText>
+                </RowFixed>
+                <RowFixed gap={'0px'}>
+                  <Text fontSize={24} fontWeight={500} style={{ marginLeft: '10px' }}>
+                    {e[0].add(e[1]).toSignificant(6) + '[' + e[0].toSignificant(6) + '|' + e[1].toSignificant(6) + ']'}
+                  </Text>
+                </RowFixed>
+              </RowBetween>
+            ) : (
+              <RowBetween align="flex-end">
+                <RowFixed gap={'0px'}>
+                  <CurrencyLogo currency={e[0].currency} size={'24px'} style={{ marginRight: '12px' }} />
+                  <TruncatedText
+                    fontSize={24}
+                    fontWeight={500}
+                    color={
+                      priceImpactSeverity > 2
+                        ? theme.red1
+                        : showAcceptChanges && swap.swapType === SwapType.EXACT_INPUT
+                        ? theme.primary1
+                        : ''
+                    }
+                  >
+                    {swap.outputAmount.toSignificant(6)}
+                  </TruncatedText>
+                </RowFixed>
+                <RowFixed gap={'0px'}>
+                  <Text fontSize={24} fontWeight={500} style={{ marginLeft: '10px' }}>
+                    {e[0].currency.symbol}
+                  </Text>
+                </RowFixed>
+              </RowBetween>
+            )}
+            {isLastItem ? null : (
+              <RowFixed>
+                <ArrowDown size="16" color={theme.text2} style={{ marginLeft: '4px', minWidth: '16px' }} />
+              </RowFixed>
+            )}
+          </>
+        )
+      })}
       {showAcceptChanges ? (
         <SwapShowAcceptChanges justify="flex-start" gap={'0px'}>
           <RowBetween>
