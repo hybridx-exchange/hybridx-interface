@@ -44,12 +44,12 @@ export default function SwapModalHeader({
   console.log(flow)
   return (
     <AutoColumn gap={'md'} style={{ marginTop: '20px' }}>
-      {flow.forEach((e, i, flow) => {
+      {flow.map((e, i, flow) => {
         const isLastItem: boolean = i === flow.length - 1
         return (
           <>
             {!isLastItem ? (
-              <RowBetween align="flex-end">
+              <RowBetween align="flex-end" key={'row' + i}>
                 <RowFixed gap={'0px'}>
                   <CurrencyLogo currency={e[0].currency} size={'24px'} style={{ marginRight: '12px' }} />
                   <TruncatedText
@@ -67,7 +67,7 @@ export default function SwapModalHeader({
                 </RowFixed>
               </RowBetween>
             ) : (
-              <RowBetween align="flex-end">
+              <RowBetween align="flex-end" key={'row' + i}>
                 <RowFixed gap={'0px'}>
                   <CurrencyLogo currency={e[0].currency} size={'24px'} style={{ marginRight: '12px' }} />
                   <TruncatedText
@@ -92,7 +92,7 @@ export default function SwapModalHeader({
               </RowBetween>
             )}
             {isLastItem ? null : (
-              <RowFixed>
+              <RowFixed key={'arrow' + i}>
                 <ArrowDown size="16" color={theme.text2} style={{ marginLeft: '4px', minWidth: '16px' }} />
               </RowFixed>
             )}
