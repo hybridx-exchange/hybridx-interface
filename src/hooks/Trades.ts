@@ -131,12 +131,13 @@ export function useGetBestOutputAmount(
     return trade.route.path.length
   })
 
-  const paths2 = paths ? Array.prototype.concat.apply([], paths) : undefined
+  const paths2 = paths && paths.length > 0 ? Array.prototype.concat.apply([], paths) : undefined
+  const lens2 = lens && lens.length > 0 ? lens : undefined
   const results = useMultipleContractSingleData(
     [PAIR_UTILS_ADDRESS],
     new Interface(IPairUtilsABI),
     'getBestAmountsOut',
-    [currencyAmountIn?.raw.toString(), paths2, lens]
+    [currencyAmountIn?.raw.toString(), paths2, lens2]
   )
 
   return useMemo(() => {
@@ -214,12 +215,13 @@ export function useGetBestInputAmount(
     return trade.route.path.length
   })
 
-  const paths2 = paths ? Array.prototype.concat.apply([], paths) : undefined
+  const paths2 = paths && paths.length > 0 ? Array.prototype.concat.apply([], paths) : undefined
+  const lens2 = lens && lens.length > 0 ? lens : undefined
   const results = useMultipleContractSingleData(
     [PAIR_UTILS_ADDRESS],
     new Interface(IPairUtilsABI),
     'getBestAmountsIn',
-    [currencyAmountOut?.raw.toString(), paths2, lens]
+    [currencyAmountOut?.raw.toString(), paths2, lens2]
   )
 
   return useMemo(() => {
