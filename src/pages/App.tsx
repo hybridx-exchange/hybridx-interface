@@ -12,11 +12,6 @@ import {
   RedirectOldAddLiquidityPathStructure,
   RedirectToAddLiquidity
 } from './AddLiquidity/redirects'
-import CreateOrderBook from './CreateOrderBook'
-import {
-  RedirectDuplicateTokenIdsForCreateOrderBook,
-  RedirectOldCreateOrderBookPathStructure
-} from './CreateOrderBook/redirects'
 import DoPool from './Pool'
 import PoolFinder from './PoolFinder'
 import RemoveLiquidity from './RemoveLiquidity'
@@ -93,13 +88,6 @@ export default function App() {
                 <Route exact path="/trade/:currencyIdA" component={RedirectOldTradePathStructure} />
                 <Route exact strict path="/create" component={RedirectToAddLiquidity} />
                 <Route exact path="/add" component={AddLiquidity} />
-                <Route exact path="/orderbook" component={CreateOrderBook} />
-                <Route exact path="/orderbook/:currencyIdBase" component={RedirectOldCreateOrderBookPathStructure} />
-                <Route
-                  exact
-                  path="/orderbook/:currencyIdBase/:currencyIdQuote"
-                  component={RedirectDuplicateTokenIdsForCreateOrderBook}
-                />
                 <Route exact path="/add/:currencyIdA" component={RedirectOldAddLiquidityPathStructure} />
                 <Route exact path="/add/:currencyIdA/:currencyIdB" component={RedirectDuplicateTokenIds} />
                 <Route exact strict path="/remove/:tokens" component={RedirectOldRemoveLiquidityPathStructure} />
