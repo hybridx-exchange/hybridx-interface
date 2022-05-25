@@ -1,5 +1,5 @@
 import { Swap, SwapType, TokenAmount } from '@hybridx-exchange/hybridx-sdk'
-import React, { useContext, useMemo } from 'react'
+import React, { Fragment, useContext, useMemo } from 'react'
 import { ArrowDown, AlertTriangle } from 'react-feather'
 import { Text } from 'rebass'
 import { ThemeContext } from 'styled-components'
@@ -38,37 +38,44 @@ export default function SwapModalHeader({
   const path = swap?.route?.path
   const flow = []
   for (let i = 0; i < path?.length - 1; i++) {
-    flow.push([new TokenAmount(path[i], extra[i * 6 + 2]), new TokenAmount(path[i], extra[i * 6 + 2])])
-    flow.push([new TokenAmount(path[i + 1], extra[i * 6 + 3]), new TokenAmount(path[i + 1], extra[i * 6 + 4])])
+    if (i === 0) {
+      flow.push([new TokenAmount(path[i], extra[i * 6 + 2]), new TokenAmount(path[i], extra[i * 6 + 4])])
+    }
+    flow.push([new TokenAmount(path[i + 1], extra[i * 6 + 3]), new TokenAmount(path[i + 1], extra[i * 6 + 5])])
   }
-  console.log(flow)
+
   return (
     <AutoColumn gap={'md'} style={{ marginTop: '20px' }}>
       {flow.map((e, i, flow) => {
         const isLastItem: boolean = i === flow.length - 1
         return (
-          <>
+          <Fragment key={i}>
             {!isLastItem ? (
-              <RowBetween align="flex-end" key={'row' + i}>
-                <RowFixed gap={'0px'}>
+              <RowBetween align="flex-end" key={'RowBetween' + i}>
+                <RowFixed gap={'0px'} key={'RowFix1' + i}>
                   <CurrencyLogo currency={e[0].currency} size={'24px'} style={{ marginRight: '12px' }} />
                   <TruncatedText
                     fontSize={24}
                     fontWeight={500}
                     color={showAcceptChanges && swap.swapType === SwapType.EXACT_OUTPUT ? theme.primary1 : ''}
                   >
-                    {e[0].add(e[1]).toSignificant(6) + '[' + e[0].toSignificant(6) + '|' + e[1].toSignificant(6) + ']'}
+                    {e[0].add(e[1]).toSignificant(6)}
                   </TruncatedText>
                 </RowFixed>
-                <RowFixed gap={'0px'}>
+                <RowFixed gap={'0px'} key={'RowFix2' + i}>
+                  <Text fontSize={12} fontWeight={500} style={{ marginLeft: '10px' }}>
+                    {'[' + e[0].toSignificant(6) + '|' + e[1].toSignificant(6) + ']'}
+                  </Text>
+                </RowFixed>
+                <RowFixed gap={'0px'} key={'RowFix3' + i}>
                   <Text fontSize={24} fontWeight={500} style={{ marginLeft: '10px' }}>
-                    {e[0].add(e[1]).toSignificant(6) + '[' + e[0].toSignificant(6) + '|' + e[1].toSignificant(6) + ']'}
+                    {e[0].currency.symbol}
                   </Text>
                 </RowFixed>
               </RowBetween>
             ) : (
-              <RowBetween align="flex-end" key={'row' + i}>
-                <RowFixed gap={'0px'}>
+              <RowBetween align="flex-end" key={'RowBetween' + i}>
+                <RowFixed gap={'0px'} key={'RowFix1' + i}>
                   <CurrencyLogo currency={e[0].currency} size={'24px'} style={{ marginRight: '12px' }} />
                   <TruncatedText
                     fontSize={24}
@@ -81,10 +88,15 @@ export default function SwapModalHeader({
                         : ''
                     }
                   >
-                    {swap.outputAmount.toSignificant(6)}
+                    {e[0].add(e[1]).toSignificant(6)}
                   </TruncatedText>
                 </RowFixed>
-                <RowFixed gap={'0px'}>
+                <RowFixed gap={'0px'} key={'RowFix2' + i}>
+                  <Text fontSize={12} fontWeight={500} style={{ marginLeft: '10px' }}>
+                    {'[' + e[0].toSignificant(6) + '|' + e[1].toSignificant(6) + ']'}
+                  </Text>
+                </RowFixed>
+                <RowFixed gap={'0px'} key={'RowFix3' + i}>
                   <Text fontSize={24} fontWeight={500} style={{ marginLeft: '10px' }}>
                     {e[0].currency.symbol}
                   </Text>
@@ -96,7 +108,7 @@ export default function SwapModalHeader({
                 <ArrowDown size="16" color={theme.text2} style={{ marginLeft: '4px', minWidth: '16px' }} />
               </RowFixed>
             )}
-          </>
+          </Fragment>
         )
       })}
       {showAcceptChanges ? (
