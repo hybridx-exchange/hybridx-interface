@@ -173,7 +173,7 @@ export function useSingleContractMultipleData(
         ? callInputs.map<Call>(inputs => {
             return {
               address: contract.address,
-              callName: methodName,
+              methodName: methodName,
               callData: contract.interface.encodeFunctionData(fragment, inputs)
             }
           })
@@ -214,7 +214,7 @@ export function useMultipleContractSingleData(
             return address && callData
               ? {
                   address,
-                  callName: methodName,
+                  methodName: methodName,
                   callData
                 }
               : undefined
@@ -264,7 +264,7 @@ export function useMultipleContractMultipleData(
     if (fragments && addresses && addresses.length > 0 && callDatas && callDatas.length === addresses.length) {
       for (let i = 0; i < addresses?.length; i++) {
         if (addresses[i] && addresses[i] !== '') {
-          callsArray.push({ address: addresses[i], callName: methodNames[i], callData: callDatas[i] })
+          callsArray.push({ address: addresses[i], methodName: methodNames[i], callData: callDatas[i] })
         }
       }
     }
@@ -300,7 +300,7 @@ export function useSingleCallResult(
       ? [
           {
             address: contract.address,
-            callName: methodName,
+            methodName: methodName,
             callData: contract.interface.encodeFunctionData(fragment, inputs)
           }
         ]

@@ -2,7 +2,7 @@ import { createAction } from '@reduxjs/toolkit'
 
 export interface Call {
   address: string
-  callName: string
+  methodName: string
   callData: string
 }
 
@@ -15,7 +15,7 @@ export function toCallKey(call: Call): string {
   if (!LOWER_HEX_REGEX.test(call.callData)) {
     throw new Error(`Invalid hex: ${call.callData}`)
   }
-  return `${call.address}-${call.callName}-${call.callData}`
+  return `${call.address}-${call.methodName}-${call.callData}`
 }
 
 export function parseCallKey(callKey: string): Call {
@@ -25,7 +25,7 @@ export function parseCallKey(callKey: string): Call {
   }
   return {
     address: pcs[0],
-    callName: pcs[1],
+    methodName: pcs[1],
     callData: pcs[2]
   }
 }
