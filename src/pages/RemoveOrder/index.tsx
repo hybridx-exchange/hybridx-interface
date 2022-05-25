@@ -227,7 +227,7 @@ export default function RemoveOrder({
                   <AutoColumn gap="10px">
                     <RowBetween>
                       <Text fontSize={14} fontWeight={500}>
-                        Order id
+                        ID
                       </Text>
                       <Text fontSize={12} fontWeight={500}>
                         {userOrder?.orderId.toString()}
@@ -236,14 +236,6 @@ export default function RemoveOrder({
                     <RowBetween>
                       <Text fontSize={14} fontWeight={500}>
                         Owner
-                      </Text>
-                      <Text fontSize={12} fontWeight={500}>
-                        {userOrder?.owner}
-                      </Text>
-                    </RowBetween>
-                    <RowBetween>
-                      <Text fontSize={14} fontWeight={500}>
-                        Receiver
                       </Text>
                       <Text fontSize={12} fontWeight={500}>
                         {userOrder?.owner}

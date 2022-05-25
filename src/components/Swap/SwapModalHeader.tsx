@@ -38,9 +38,7 @@ export default function SwapModalHeader({
   const path = swap?.route?.path
   const flow = []
   for (let i = 0; i < path?.length - 1; i++) {
-    if (i === 0) {
-      flow.push([new TokenAmount(path[i], extra[i * 6 + 2]), new TokenAmount(path[i], extra[i * 6 + 4])])
-    }
+    flow.push([new TokenAmount(path[i], extra[i * 6 + 2]), new TokenAmount(path[i], extra[i * 6 + 4])])
     flow.push([new TokenAmount(path[i + 1], extra[i * 6 + 3]), new TokenAmount(path[i + 1], extra[i * 6 + 5])])
   }
 

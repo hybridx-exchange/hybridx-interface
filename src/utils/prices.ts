@@ -6,7 +6,7 @@ import { basisPointsToPercent } from './index'
 
 const BASE_FEE = new Percent(JSBI.BigInt(30), JSBI.BigInt(10000))
 const ONE_HUNDRED_PERCENT = new Percent(JSBI.BigInt(10000), JSBI.BigInt(10000))
-const INPUT_FRACTION_AFTER_FEE = ONE_HUNDRED_PERCENT.subtract(BASE_FEE)
+//const INPUT_FRACTION_AFTER_FEE = ONE_HUNDRED_PERCENT.subtract(BASE_FEE)
 
 // computes price breakdown for the trade
 export function computeTradePriceBreakdown(
@@ -14,14 +14,27 @@ export function computeTradePriceBreakdown(
 ): { priceImpactWithoutFee?: Percent; realizedLPFee?: CurrencyAmount } {
   // for each hop in our trade, take away the x*y=k price impact from 0.3% fees
   // e.g. for 3 tokens/2 hops: 1 - ((1 - .03) * (1-.03))
-  const realizedLPFee = !swap
+  // 1 - (1 - percent of amm amount in trade * .03) * (1 - percent of amm amount in trade * .03)
+  const extra = swap?.route?.extra ?? []
+  const path = swap?.route?.path ?? []
+  let realizedLPFee: undefined | Fraction = ONE_HUNDRED_PERCENT
+  for (let i = 0; i < path?.length - 1; i++) {
+    const ammAmount = new TokenAmount(path[i], extra[i * 6 + 2])
+    const orderAmount = new TokenAmount(path[i], extra[i * 6 + 4])
+    const percent = ammAmount.divide(ammAmount.add(orderAmount))
+    realizedLPFee = realizedLPFee.multiply(ONE_HUNDRED_PERCENT.subtract(percent.multiply(BASE_FEE)))
+  }
+
+  realizedLPFee = realizedLPFee === ONE_HUNDRED_PERCENT ? undefined : ONE_HUNDRED_PERCENT.subtract(realizedLPFee)
+
+  /*const realizedLPFee = !swap
     ? undefined
     : ONE_HUNDRED_PERCENT.subtract(
         swap.route.pairs.reduce<Fraction>(
           (currentFee: Fraction): Fraction => currentFee.multiply(INPUT_FRACTION_AFTER_FEE),
           ONE_HUNDRED_PERCENT
         )
-      )
+      )*/
 
   // remove lp fees from price impact
   const priceImpactWithoutFeeFraction = swap && realizedLPFee ? swap.priceImpact.subtract(realizedLPFee) : undefined
@@ -38,7 +51,7 @@ export function computeTradePriceBreakdown(
     (swap.inputAmount instanceof TokenAmount
       ? new TokenAmount(swap.inputAmount.token, realizedLPFee.multiply(swap.inputAmount.raw).quotient)
       : CurrencyAmount.ether(realizedLPFee.multiply(swap.inputAmount.raw).quotient))
-
+  //console.log(realizedLPFee?.toSignificant(6), realizedLPFeeAmount?.toSignificant())
   return { priceImpactWithoutFee: priceImpactWithoutFeePercent, realizedLPFee: realizedLPFeeAmount }
 }
 

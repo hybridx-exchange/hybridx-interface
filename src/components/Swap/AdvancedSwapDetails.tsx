@@ -53,7 +53,7 @@ function TradeSummary({ swap, allowedSlippage }: { swap: Swap; allowedSlippage: 
             <TYPE.black fontSize={14} fontWeight={400} color={theme.text2}>
               Liquidity Provider Fee
             </TYPE.black>
-            <QuestionHelper text="A portion of each trade (0.30%) goes to liquidity providers as a protocol incentive." />
+            <QuestionHelper text="A portion of the AMM portion of each trade (0.30%) goes to liquidity providers as protocol incentives." />
           </RowFixed>
           <TYPE.black fontSize={14} color={theme.text1}>
             {realizedLPFee ? `${realizedLPFee.toSignificant(4)} ${swap.inputAmount.currency.symbol}` : '-'}
