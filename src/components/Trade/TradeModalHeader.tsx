@@ -27,11 +27,17 @@ export default function TradeModalHeader({
       <RowBetween align="flex-end">
         <RowFixed>
           <TruncatedText size="16" color={theme.text2} style={{ marginLeft: '4px', minWidth: '16px' }}>
+            {!trade?.orderBook?.exist ? 'Create and ' : ''}
             {trade?.tradeType === TradeType.LIMIT_BUY ? 'Buy ' + trade?.baseToken.symbol + ' with' : 'Sell amount'}
           </TruncatedText>
         </RowFixed>
         <RowFixed gap={'0px'}>
-          <TruncatedText fontSize={24} fontWeight={500} color={showAcceptChanges ? theme.primary1 : ''} textAlign={'right'}>
+          <TruncatedText
+            fontSize={24}
+            fontWeight={500}
+            color={showAcceptChanges ? theme.primary1 : ''}
+            textAlign={'right'}
+          >
             {trade?.amount.toExact() + ' ' + trade?.amount.currency.symbol}
           </TruncatedText>
         </RowFixed>

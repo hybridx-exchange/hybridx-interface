@@ -57,7 +57,7 @@ function TradeSummary({ trade }: { trade: Trade }) {
         <RowBetween>
           <RowFixed>
             <TYPE.black fontSize={14} fontWeight={400} color={theme.text2}>
-              {'LEFT/EXPECT'}
+              {'Left/Expected'}
             </TYPE.black>
             <QuestionHelper text="Left/Expected amount in limit order." />
           </RowFixed>

@@ -16,7 +16,6 @@ import { Text } from 'rebass'
 import styled, { ThemeContext } from 'styled-components'
 import AddressInputPanel from '../../components/AddressInputPanel'
 import { ButtonConfirmed, ButtonError, ButtonLight } from '../../components/Button'
-import { GreyCard } from '../../components/Card'
 import { AutoColumn } from '../../components/Column'
 import ConfirmTradeModal from '../../components/Trade/ConfirmTradeModal'
 import CurrencyInputPanel from '../../components/CurrencyInputPanel'
@@ -34,7 +33,7 @@ import { useWalletModalToggle } from '../../state/application/hooks'
 import { Field, Input } from '../../state/trade/actions'
 import { tryParseAmount, useDerivedTradeInfo, useTradeActionHandlers, useTradeState } from '../../state/trade/hooks'
 import { useExpertModeManager, useUserDeadline } from '../../state/user/hooks'
-import { LinkStyledButton, StyledInternalLink, TYPE } from '../../theme'
+import { LinkStyledButton, StyledInternalLink } from '../../theme'
 import { maxAmountSpend } from '../../utils/maxAmountSpend'
 import AppBody from '../AppBody'
 import Loader from '../../components/Loader'
@@ -151,13 +150,6 @@ export default function DoTrade({
     tradeErrorMessage: undefined,
     txHash: undefined
   })
-
-  const userHasSpecifiedInputPrice = Boolean(
-    currencies[Field.CURRENCY_A] &&
-      currencies[Field.CURRENCY_B] &&
-      parsedAmounts[Input.AMOUNT]?.greaterThan(JSBI.BigInt(0)) &&
-      parsedAmounts[Input.PRICE]?.greaterThan(JSBI.BigInt(0))
-  )
 
   // check whether the user has approved the router on the input token
   const [approval, approveCallback] = useApproveCallback(parsedAmountAmount, ORDER_BOOK_ROUTER_ADDRESS)
@@ -417,10 +409,6 @@ export default function DoTrade({
           <BottomGrouping>
             {!account ? (
               <ButtonLight onClick={toggleWalletModal}>Connect Wallet</ButtonLight>
-            ) : !trade?.orderBook && userHasSpecifiedInputPrice ? (
-              <GreyCard style={{ textAlign: 'center' }}>
-                <TYPE.main mb="4px">Insufficient liquidity for this trade.</TYPE.main>
-              </GreyCard>
             ) : showApproveFlow ? (
               <RowBetween>
                 <ButtonConfirmed

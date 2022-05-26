@@ -337,12 +337,16 @@ export function useOrderBook(
       CONFIG_ADDRESS,
       CONFIG_ADDRESS,
       CONFIG_ADDRESS,
+      CONFIG_ADDRESS,
+      CONFIG_ADDRESS,
       CONFIG_ADDRESS
     ],
     [
       new Interface(IOrderBookRouterABI),
       pairUtilsInterface,
       orderBookInterface,
+      configInterface,
+      configInterface,
       configInterface,
       configInterface,
       configInterface,
@@ -355,7 +359,9 @@ export function useOrderBook(
       'protocolFeeRate',
       'subsidyFeeRate',
       'priceStepFactor',
-      'priceStepMap'
+      'priceStepMap',
+      'baseSignificantDigits',
+      'quoteSignificantDigits'
     ],
     [
       tokenIn && tokenOut
@@ -366,6 +372,8 @@ export function useOrderBook(
       [orderBookAddress === '' ? ZERO_ADDRESS : orderBookAddress],
       [orderBookAddress === '' ? ZERO_ADDRESS : orderBookAddress],
       [],
+      [orderBookAddress === '' ? ZERO_ADDRESS : orderBookAddress],
+      [orderBookAddress === '' ? ZERO_ADDRESS : orderBookAddress],
       [orderBookAddress === '' ? ZERO_ADDRESS : orderBookAddress]
     ]
   )
@@ -381,12 +389,14 @@ export function useOrderBook(
       !returns ||
       returns.length === 0 ||
       returns[0].loading ||
-      returns.length !== 7 ||
+      returns.length !== 9 ||
       !returns[1].data ||
       !returns[3].data ||
       !returns[4].data ||
       !returns[5].data ||
-      !returns[6].data
+      !returns[6].data ||
+      !returns[7].data ||
+      !returns[8].data
     ) {
       return null
     }
@@ -412,6 +422,12 @@ export function useOrderBook(
     const {
       data: [priceStep]
     } = returns[6]
+    const {
+      data: [baseSignificantDigits]
+    } = returns[7]
+    const {
+      data: [quoteSignificantDigits]
+    } = returns[8]
     const exist = !price || price.eq(BigNumber.from(0)) ? false : true
     const baseToken = exist
       ? baseTokenAddress.toLowerCase() === tokenIn?.address.toLowerCase()
@@ -468,6 +484,8 @@ export function useOrderBook(
             exist,
             baseAmount,
             quoteAmount,
+            baseSignificantDigits.toNumber(),
+            quoteSignificantDigits.toNumber(),
             priceStep,
             priceStepFactor,
             protocolFeeRate,

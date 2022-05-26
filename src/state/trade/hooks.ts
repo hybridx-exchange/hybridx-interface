@@ -180,26 +180,11 @@ export function useDerivedTradeInfo(
   }
 
   if (noLiquidity) {
-    inputError = inputError ?? 'Add liquidity first'
+    inputError = inputError ?? 'Insufficient liquidity for this pair.'
   }
 
   if (!parsedAmountAmount) {
     inputError = inputError ?? 'Enter ' + (type === TradeType.LIMIT_BUY ? 'buy' : 'sell') + ' amount'
-  }
-
-  if (orderBook?.minAmount) {
-    if (
-      type === TradeType.LIMIT_BUY &&
-      parsedPriceAmount &&
-      JSBI.LT(parsedAmountAmount, orderBook.getMinQuoteAmount(parsedPriceAmount.raw))
-    ) {
-      inputError = inputError ?? 'Invalid amount'
-    } else if (
-      type === TradeType.LIMIT_SELL &&
-      JSBI.LT(parsedAmountAmount, parseBigintIsh(orderBook?.minAmount as BigintIsh))
-    ) {
-      inputError = inputError ?? 'Invalid amount'
-    }
   }
 
   if (!parsedPriceAmount) {

@@ -31,11 +31,25 @@ export function OrderBookDetails({ orderBook, currencies }: OrderBookDetailsProp
         <div>
           <RowBetween align="center" style={{ padding: '10px 20px' }}>
             <ClickableText fontWeight={500} fontSize={14} color={theme.text2}>
-              Minimum amount
+              Base Significant Digits
             </ClickableText>
             <ClickableText fontWeight={500} fontSize={14} color={theme.text2}>
-              {orderBook?.minAmount && currencyBase
-                ? formatUnits(orderBook?.minAmount.toString(), currencyBase?.decimals) + ' ' + currencyBase.symbol
+              {orderBook?.baseSignificantDigits && currencyBase
+                ? orderBook?.baseSignificantDigits < currencyBase.decimals
+                  ? orderBook?.baseSignificantDigits
+                  : currencyBase.decimals
+                : '-'}
+            </ClickableText>
+          </RowBetween>
+          <RowBetween align="center" style={{ padding: '10px 20px' }}>
+            <ClickableText fontWeight={500} fontSize={14} color={theme.text2}>
+              Quote Significant Digits
+            </ClickableText>
+            <ClickableText fontWeight={500} fontSize={14} color={theme.text2}>
+              {orderBook?.quoteSignificantDigits && currencyQuote
+                ? orderBook?.quoteSignificantDigits < currencyQuote.decimals
+                  ? orderBook?.quoteSignificantDigits
+                  : currencyQuote.decimals
                 : '-'}
             </ClickableText>
           </RowBetween>
@@ -47,6 +61,14 @@ export function OrderBookDetails({ orderBook, currencies }: OrderBookDetailsProp
               {orderBook?.priceStep && currencyQuote
                 ? formatUnits(orderBook?.priceStep.toString(), currencyQuote.decimals) + ' ' + currencyQuote.symbol
                 : '-'}
+            </ClickableText>
+          </RowBetween>
+          <RowBetween align="center" style={{ padding: '10px 20px' }}>
+            <ClickableText fontWeight={500} fontSize={14} color={theme.text2}>
+              Price step factor
+            </ClickableText>
+            <ClickableText fontWeight={500} fontSize={14} color={theme.text2}>
+              {orderBook?.priceStepFactor ? orderBook?.priceStepFactor.toString() + '/10000' : '-'}
             </ClickableText>
           </RowBetween>
           <RowBetween align="center" style={{ padding: '10px 20px' }}>
