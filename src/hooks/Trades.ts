@@ -119,16 +119,16 @@ export function useGetBestOutputAmount(
   currencyAmountIn?: CurrencyAmount,
   currencyOut?: Currency,
   allPairs?: Pair[],
-  allSwaps?: Swap[] | null
+  allRoutes?: Route[] | null
 ): { loading: boolean; bestSwap: Swap | null } {
-  const paths = allSwaps?.map(trade => {
-    return trade.route.path.map(token => {
+  const paths = allRoutes?.map(route => {
+    return route.path.map(token => {
       return token.address
     })
   })
 
-  const lens = allSwaps?.map(trade => {
-    return trade.route.path.length
+  const lens = allRoutes?.map(route => {
+    return route.path.length
   })
 
   const paths2 = paths && paths.length > 0 ? Array.prototype.concat.apply([], paths) : undefined
@@ -160,7 +160,8 @@ export function useGetBestOutputAmount(
     const path = data && data.path ? data.path : []
     const amounts = data && data.amounts ? data.amounts : []
     const extra = data && data.extra ? data.extra : []
-    /*extra.length > 0 &&
+    amounts.length > 0 && console.log(amounts[0].toString(), amounts[1].toString())
+    extra.length > 0 &&
       console.log(
         extra[0].toString(),
         extra[1].toString(),
@@ -168,7 +169,10 @@ export function useGetBestOutputAmount(
         extra[3].toString(),
         extra[4].toString(),
         extra[5].toString()
-      )*/
+      )
+    if (amounts.length < 2 || amounts[0].toString() === '0' || amounts[amounts.length - 1].toString() === '0') {
+      return { loading: true, bestSwap: null }
+    }
     const pairs: Pair[] = []
     for (let i = 1; i < path?.length; i++) {
       if (allPairs) {
@@ -181,7 +185,7 @@ export function useGetBestOutputAmount(
       }
     }
 
-    if (!currencyAmountIn || !currencyOut || !allPairs || !allSwaps || !pairs.length) {
+    if (!currencyAmountIn || !currencyOut || !allPairs || !allRoutes || !pairs.length) {
       return { loading: true, bestSwap: null }
     } else {
       return {
@@ -193,7 +197,7 @@ export function useGetBestOutputAmount(
         )
       }
     }
-  }, [allPairs, allSwaps, currencyAmountIn, currencyOut, results])
+  }, [allPairs, allRoutes, currencyAmountIn, currencyOut, results])
 }
 
 /**
@@ -203,20 +207,21 @@ export function useGetBestInputAmount(
   currencyIn?: Currency,
   currencyAmountOut?: CurrencyAmount,
   allPairs?: Pair[],
-  allSwaps?: Swap[] | null
+  allRoutes?: Route[] | null
 ): { loading: boolean; bestSwap: Swap | null } {
-  const paths = allSwaps?.map(trade => {
-    return trade.route.path.map(token => {
+  const paths = allRoutes?.map(route => {
+    return route.path.map(token => {
       return token.address
     })
   })
 
-  const lens = allSwaps?.map(trade => {
-    return trade.route.path.length
+  const lens = allRoutes?.map(route => {
+    return route.path.length
   })
 
   const paths2 = paths && paths.length > 0 ? Array.prototype.concat.apply([], paths) : undefined
   const lens2 = lens && lens.length > 0 ? lens : undefined
+  //console.log(paths2, lens2)
   const results = useMultipleContractSingleData(
     [PAIR_UTILS_ADDRESS],
     new Interface(IPairUtilsABI),
@@ -242,7 +247,8 @@ export function useGetBestInputAmount(
     const path = data && data.path ? data.path : []
     const amounts = data && data.amounts ? data.amounts : []
     const extra = data && data.extra ? data.extra : []
-    /*extra.length > 0 &&
+    amounts.length > 0 && console.log(amounts[0].toString(), amounts[1].toString())
+    extra.length > 0 &&
       console.log(
         extra[0].toString(),
         extra[1].toString(),
@@ -250,7 +256,10 @@ export function useGetBestInputAmount(
         extra[3].toString(),
         extra[4].toString(),
         extra[5].toString()
-      )*/
+      )
+    if (amounts.length < 2 || amounts[0].toString() === '0' || amounts[amounts.length - 1].toString() === '0') {
+      return { loading: true, bestSwap: null }
+    }
     const pairs: Pair[] = []
     for (let i = 1; i < path?.length; i++) {
       if (allPairs) {
@@ -263,7 +272,7 @@ export function useGetBestInputAmount(
       }
     }
 
-    if (!currencyAmountOut || !currencyIn || !allPairs || !allSwaps || !pairs.length) {
+    if (!currencyAmountOut || !currencyIn || !allPairs || !allRoutes || !pairs.length) {
       return { loading: true, bestSwap: null }
     } else {
       return {
@@ -275,7 +284,7 @@ export function useGetBestInputAmount(
         )
       }
     }
-  }, [allPairs, allSwaps, currencyAmountOut, currencyIn, results])
+  }, [allPairs, allRoutes, currencyAmountOut, currencyIn, results])
 }
 
 /**
@@ -287,8 +296,11 @@ export function useSwapExactIn(currencyAmountIn?: CurrencyAmount, currencyOut?: 
   const allSwap = useMemo(() => {
     if (currencyAmountIn && currencyOut && allowedPairs.length > 0) {
       if (singleHopOnly)
-        return Swap.bestTradeExactIn(allowedPairs, currencyAmountIn, currencyOut, { maxHops: 1, maxNumResults: 1 })
-      return Swap.bestTradeExactIn(allowedPairs, currencyAmountIn, currencyOut, { maxHops: 3, maxNumResults: 1 })
+        return Swap.allPathExactIn(allowedPairs, currencyAmountIn.currency, currencyOut, {
+          maxHops: 1,
+          maxNumResults: 1
+        })
+      return Swap.allPathExactIn(allowedPairs, currencyAmountIn.currency, currencyOut, { maxHops: 3, maxNumResults: 1 })
     }
     return null
   }, [allowedPairs, singleHopOnly, currencyAmountIn, currencyOut])
@@ -305,8 +317,14 @@ export function useSwapExactOut(currencyIn?: Currency, currencyAmountOut?: Curre
   const allSwap = useMemo(() => {
     if (currencyIn && currencyAmountOut && allowedPairs.length > 0) {
       if (singleHopOnly)
-        return Swap.bestTradeExactOut(allowedPairs, currencyIn, currencyAmountOut, { maxHops: 1, maxNumResults: 1 })
-      return Swap.bestTradeExactOut(allowedPairs, currencyIn, currencyAmountOut, { maxHops: 3, maxNumResults: 1 })
+        return Swap.allPathExactOut(allowedPairs, currencyIn, currencyAmountOut.currency, {
+          maxHops: 1,
+          maxNumResults: 1
+        })
+      return Swap.allPathExactOut(allowedPairs, currencyIn, currencyAmountOut.currency, {
+        maxHops: 3,
+        maxNumResults: 1
+      })
     }
     return null
   }, [allowedPairs, singleHopOnly, currencyIn, currencyAmountOut])

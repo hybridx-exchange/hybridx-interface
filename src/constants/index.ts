@@ -4,9 +4,9 @@ import { AbstractConnector } from '@web3-react/abstract-connector'
 //import { fortmatic, injected, portis, walletconnect, walletlink } from '../connectors'
 import { injected /*, walletconnect*/ } from '../connectors'
 
-export const PAIR_ROUTER_ADDRESS = '0x81337007d438493013f9c5fB89bc59c1CA8D24fB'
-export const PAIR_UTILS_ADDRESS = '0xe5935f866C60172B8f160809d45e91e75f279350'
-export const ORDER_BOOK_ROUTER_ADDRESS = '0x171676EeF944728102cC8d34E25ADA03BB35FfFC'
+export const PAIR_ROUTER_ADDRESS = '0x5bA75073797af99B5CE6cf8B22778E700D893139'
+export const PAIR_UTILS_ADDRESS = '0x2B986Be12d8f469D62D11FeC94217230E225f9de'
+export const ORDER_BOOK_ROUTER_ADDRESS = '0x43364ae809A4AD01a1281FD0709E4755ec76Be94'
 
 export const DEFAULT_LIMIT_SIZE = 8
 export const ZERO_ADDRESS = '0x0000000000000000000000000000000000000000'
