@@ -131,10 +131,11 @@ export function useGetBestOutputAmount(
     return route.path.length
   })
 
+  const chainId = allRoutes && allRoutes.length > 0 ? allRoutes[0].chainId : undefined
   const paths2 = paths && paths.length > 0 ? Array.prototype.concat.apply([], paths) : undefined
   const lens2 = lens && lens.length > 0 ? lens : undefined
   const results = useMultipleContractSingleData(
-    [PAIR_UTILS_ADDRESS],
+    [chainId ? PAIR_UTILS_ADDRESS[chainId] : ''],
     new Interface(IPairUtilsABI),
     'getBestAmountsOut',
     [currencyAmountIn?.raw.toString(), paths2, lens2]
@@ -219,11 +220,12 @@ export function useGetBestInputAmount(
     return route.path.length
   })
 
+  const chainId = allRoutes && allRoutes.length > 0 ? allRoutes[0].chainId : undefined
   const paths2 = paths && paths.length > 0 ? Array.prototype.concat.apply([], paths) : undefined
   const lens2 = lens && lens.length > 0 ? lens : undefined
   //console.log(paths2, lens2)
   const results = useMultipleContractSingleData(
-    [PAIR_UTILS_ADDRESS],
+    [chainId ? PAIR_UTILS_ADDRESS[chainId] : ''],
     new Interface(IPairUtilsABI),
     'getBestAmountsIn',
     [currencyAmountOut?.raw.toString(), paths2, lens2]
@@ -349,15 +351,15 @@ export function useOrderBook(
   const configInterface = new Interface(IConfigABI)
   const results = useMultipleContractMultipleData(
     [
-      tokenIn && tokenOut && tokenIn.address !== tokenOut.address ? ORDER_BOOK_ROUTER_ADDRESS : '',
-      tokenIn && tokenOut && tokenIn.address !== tokenOut.address ? PAIR_UTILS_ADDRESS : '',
+      chainId && tokenIn && tokenOut && tokenIn.address !== tokenOut.address ? ORDER_BOOK_ROUTER_ADDRESS[chainId] : '',
+      chainId && tokenIn && tokenOut && tokenIn.address !== tokenOut.address ? PAIR_UTILS_ADDRESS[chainId] : '',
       orderBookAddress,
-      CONFIG_ADDRESS,
-      CONFIG_ADDRESS,
-      CONFIG_ADDRESS,
-      CONFIG_ADDRESS,
-      CONFIG_ADDRESS,
-      CONFIG_ADDRESS
+      chainId ? CONFIG_ADDRESS[chainId] : '',
+      chainId ? CONFIG_ADDRESS[chainId] : '',
+      chainId ? CONFIG_ADDRESS[chainId] : '',
+      chainId ? CONFIG_ADDRESS[chainId] : '',
+      chainId ? CONFIG_ADDRESS[chainId] : '',
+      chainId ? CONFIG_ADDRESS[chainId] : ''
     ],
     [
       new Interface(IOrderBookRouterABI),
@@ -528,9 +530,9 @@ export function useTradeRet(
 ): TradeRet | null {
   const tokenBase = type === TradeType.LIMIT_BUY ? tokenOut : tokenIn
   const tokenQuote = type === TradeType.LIMIT_BUY ? tokenIn : tokenOut
-
+  const chainId = tokenBase?.chainId
   const results = useMultipleContractMultipleData(
-    [tokenIn && tokenOut && amount && price && type ? ORDER_BOOK_ROUTER_ADDRESS : ''],
+    [chainId && tokenIn && tokenOut && amount && price && type ? ORDER_BOOK_ROUTER_ADDRESS[chainId] : ''],
     [new Interface(IOrderBookRouterABI)],
     [type === TradeType.LIMIT_BUY ? 'getAmountsForBuy' : 'getAmountsForSell'],
     [

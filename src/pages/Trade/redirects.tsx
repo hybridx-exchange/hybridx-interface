@@ -1,6 +1,8 @@
 import React from 'react'
 import { Redirect, RouteComponentProps } from 'react-router-dom'
 import DoTrade from './index'
+import { useActiveWeb3React } from '../../hooks'
+import { ETHER } from '@hybridx-exchange/hybridx-sdk'
 
 const OLD_PATH_STRUCTURE = /^(0x[a-fA-F0-9]{40})-(0x[a-fA-F0-9]{40})$/
 export function RedirectOldTradePathStructure(props: RouteComponentProps<{ currencyIdA: string }>) {
@@ -25,8 +27,9 @@ export function RedirectDuplicateTokenIdsForTrade(
       params: { currencyIdA, currencyIdB, inputPrice }
     }
   } = props
+  const { chainId } = useActiveWeb3React()
   if (currencyIdA.toLowerCase() === currencyIdB.toLowerCase()) {
-    return <Redirect to={`/trade/ROSE/${currencyIdA}/${inputPrice}`} />
+    return <Redirect to={`/trade/${chainId ? ETHER[chainId].symbol : undefined}/${currencyIdA}/${inputPrice}`} />
   }
   return <DoTrade {...props} />
 }

@@ -51,11 +51,12 @@ import { OrderBookTable } from '../../components/Swap/OrderBookTable'
 
 export default function DoSwap() {
   const loadedUrlParams = useDefaultsFromURLSearch()
-
+  const { account, chainId } = useActiveWeb3React()
+  const theme = useContext(ThemeContext)
   // token warning stuff
   const [loadedInputCurrency, loadedOutputCurrency] = [
-    useCurrency(loadedUrlParams?.inputCurrencyId),
-    useCurrency(loadedUrlParams?.outputCurrencyId)
+    useCurrency(loadedUrlParams?.inputCurrencyId, chainId),
+    useCurrency(loadedUrlParams?.outputCurrencyId, chainId)
   ]
   const [dismissTokenWarning, setDismissTokenWarning] = useState<boolean>(false)
   const urlLoadedTokens: Token[] = useMemo(
@@ -65,9 +66,6 @@ export default function DoSwap() {
   const handleConfirmTokenWarning = useCallback(() => {
     setDismissTokenWarning(true)
   }, [])
-
-  const { account } = useActiveWeb3React()
-  const theme = useContext(ThemeContext)
 
   // toggle wallet when disconnected
   const toggleWalletModal = useWalletModalToggle()
@@ -167,7 +165,7 @@ export default function DoSwap() {
     }
   }, [approval, approvalSubmitted])
 
-  const maxAmountInput: CurrencyAmount | undefined = maxAmountSpend(currencyBalances[Field.INPUT])
+  const maxAmountInput: CurrencyAmount | undefined = maxAmountSpend(currencyBalances[Field.INPUT], chainId)
   const atMaxAmountInput = Boolean(maxAmountInput && parsedAmounts[Field.INPUT]?.equalTo(maxAmountInput))
 
   // the callback to execute the swap

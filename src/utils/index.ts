@@ -31,8 +31,10 @@ export function isAddress(value: any): string | false {
 }
 
 const ETHERSCAN_PREFIXES: { [chainId in ChainId]: string } = {
-  42262: '',
-  42261: '.testnet'
+  [ChainId.MAINNET]: '',
+  [ChainId.TESTNET]: '.testnet',
+  [ChainId.OPTIMISM_TESTNET]: '',
+  [ChainId.OPTIMISM_MAINNET]: ''
 }
 
 export function getEtherscanLink(chainId: ChainId, data: string, type: 'transaction' | 'token' | 'address'): string {
@@ -101,26 +103,41 @@ export function getContract(address: string, ABI: any, library: Web3Provider, ac
 }
 
 // account is optional
-export function getPairRouterContract(_: number, library: Web3Provider, account?: string): Contract {
-  return getContract(PAIR_ROUTER_ADDRESS, IPairRouterABI, library, account)
+export function getPairRouterContract(
+  _: number,
+  library: Web3Provider,
+  account?: string,
+  chainId?: ChainId
+): Contract | null {
+  return chainId ? getContract(PAIR_ROUTER_ADDRESS[chainId], IPairRouterABI, library, account) : null
 }
 
 // account is optional
-export function getOrderBookFactoryContract(_: number, library: Web3Provider, account?: string): Contract {
-  return getContract(ORDER_BOOK_FACTORY_ADDRESS, IOrderBookFactoryABI, library, account)
+export function getOrderBookFactoryContract(
+  _: number,
+  library: Web3Provider,
+  account?: string,
+  chainId?: ChainId
+): Contract | null {
+  return chainId ? getContract(ORDER_BOOK_FACTORY_ADDRESS[chainId], IOrderBookFactoryABI, library, account) : null
 }
 
 // account is optional
-export function getOrderBookRouterContract(_: number, library: Web3Provider, account?: string): Contract {
-  return getContract(ORDER_BOOK_ROUTER_ADDRESS, IOrderBookRouterABI, library, account)
+export function getOrderBookRouterContract(
+  _: number,
+  library: Web3Provider,
+  account?: string,
+  chainId?: ChainId
+): Contract | null {
+  return chainId ? getContract(ORDER_BOOK_ROUTER_ADDRESS[chainId], IOrderBookRouterABI, library, account) : null
 }
 
 export function escapeRegExp(string: string): string {
   return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') // $& means the whole matched string
 }
 
-export function isTokenOnList(defaultTokens: TokenAddressMap, currency?: Currency): boolean {
-  if (currency === ETHER) return true
+export function isTokenOnList(defaultTokens: TokenAddressMap, currency?: Currency, chainId?: ChainId): boolean {
+  if (chainId && currency === ETHER[chainId]) return true
   return Boolean(currency instanceof Token && defaultTokens[currency.chainId]?.[currency.address])
 }
 
@@ -128,18 +145,14 @@ export function getOrderBook(orderBookAddress: string, library: Web3Provider, ac
   return getContract(orderBookAddress, IOrderBookABI, library, account)
 }
 
-export function addChain() {
+export function addChain(chainId: ChainId) {
   const method = 'wallet_addEthereumChain'
   const params = [
     {
-      chainId: '0x' + ChainId.TESTNET.toString(16),
+      chainId: '0x' + chainId.toString(16),
       chainName: 'Emerald testnet',
       rpcUrls: ['https://testnet.emerald.oasis.dev'],
-      nativeCurrency: {
-        name: 'ROSE',
-        symbol: 'ROSE',
-        decimals: 18
-      },
+      nativeCurrency: ETHER[chainId],
       blockExplorerUrls: ['https://testnet.explorer.emerald.oasis.dev']
     }
   ]

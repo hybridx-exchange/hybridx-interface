@@ -124,7 +124,7 @@ export function MinimalPositionCard({ pair, showUnwrapped = false, border }: Pos
 }
 
 export default function FullPositionCard({ pair, border }: PositionCardProps) {
-  const { account } = useActiveWeb3React()
+  const { account, chainId } = useActiveWeb3React()
 
   const currency0 = unwrappedToken(pair.token0)
   const currency1 = unwrappedToken(pair.token1)
@@ -229,10 +229,18 @@ export default function FullPositionCard({ pair, border }: PositionCardProps) {
               </ExternalLink>
             </AutoRow>
             <RowBetween marginTop="10px">
-              <ButtonSecondary as={Link} to={`/add/${currencyId(currency0)}/${currencyId(currency1)}`} width="48%">
+              <ButtonSecondary
+                as={Link}
+                to={`/add/${currencyId(currency0, chainId)}/${currencyId(currency1, chainId)}`}
+                width="48%"
+              >
                 Add
               </ButtonSecondary>
-              <ButtonSecondary as={Link} width="48%" to={`/remove/${currencyId(currency0)}/${currencyId(currency1)}`}>
+              <ButtonSecondary
+                as={Link}
+                width="48%"
+                to={`/remove/${currencyId(currency0, chainId)}/${currencyId(currency1, chainId)}`}
+              >
                 Remove
               </ButtonSecondary>
             </RowBetween>

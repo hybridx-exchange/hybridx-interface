@@ -1,6 +1,6 @@
 import React, { useCallback, useContext, useMemo, useState } from 'react'
 import styled, { ThemeContext } from 'styled-components'
-import { Currency, ETHER, OrderBook } from '@hybridx-exchange/hybridx-sdk'
+import { Currency, ETHER, OrderBook, WETH } from '@hybridx-exchange/hybridx-sdk'
 import { SwapPoolTabs } from '../../components/NavigationTabs'
 
 import Question from '../../components/QuestionHelper'
@@ -30,7 +30,7 @@ export default function DoUserOrder() {
   const { account } = useActiveWeb3React()
   const [onImport, setOnImport] = useState<boolean>(false)
 
-  const [currencyA, setCurrencyA] = useState<Currency | null>(ETHER)
+  const [currencyA, setCurrencyA] = useState<Currency | null>(chainId ? ETHER[chainId] : null)
   const [currencyB, setCurrencyB] = useState<Currency | null>(null)
 
   // fetch the user's balances of all tracked V2 LP tokens
@@ -51,13 +51,14 @@ export default function DoUserOrder() {
 
   const handleTokenASelect = useCallback(
     (currency: Currency) => {
-      const currencyWRose = wrappedCurrency(ETHER, chainId)
-      const newCurrencyIdA = currencyId(currency)
-      const currencyIdB = currencyB ? currencyId(currencyB) : ''
+      const currencyWETH = chainId ? WETH[chainId] : undefined
+      const newCurrencyIdA = currencyId(currency, chainId)
+      const ethSymbol = chainId ? ETHER[chainId].symbol : undefined
+      const currencyIdB = currencyB ? currencyId(currencyB, chainId) : ''
       if (
         newCurrencyIdA === currencyIdB ||
-        (newCurrencyIdA === ETHER.symbol && currencyB === currencyWRose) ||
-        (newCurrencyIdA === currencyWRose?.address && currencyIdB === ETHER.symbol)
+        (newCurrencyIdA === ethSymbol && currencyB === currencyWETH) ||
+        (newCurrencyIdA === currencyWETH?.address && currencyIdB === ethSymbol)
       ) {
         setCurrencyA(currencyB)
         setCurrencyB(currencyA)
@@ -70,13 +71,14 @@ export default function DoUserOrder() {
 
   const handleTokenBSelect = useCallback(
     (currency: Currency) => {
-      const currencyWRose = wrappedCurrency(ETHER, chainId)
-      const newCurrencyIdB = currencyId(currency)
-      const currencyIdA = currencyA ? currencyId(currencyA) : ''
+      const currencyWETH = chainId ? WETH[chainId] : undefined
+      const newCurrencyIdB = currencyId(currency, chainId)
+      const ethSymbol = chainId ? ETHER[chainId].symbol : undefined
+      const currencyIdA = currencyA ? currencyId(currencyA, chainId) : ''
       if (
         newCurrencyIdB === currencyIdA ||
-        (newCurrencyIdB === ETHER.symbol && currencyA === currencyWRose) ||
-        (newCurrencyIdB === currencyWRose?.address && currencyIdA === ETHER.symbol)
+        (newCurrencyIdB === ethSymbol && currencyA === currencyWETH) ||
+        (newCurrencyIdB === currencyWETH?.address && currencyIdA === ethSymbol)
       ) {
         setCurrencyB(currencyA)
         setCurrencyA(currencyB)

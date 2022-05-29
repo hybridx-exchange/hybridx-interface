@@ -1,5 +1,5 @@
 import { parseBytes32String } from '@ethersproject/strings'
-import { Currency, ETHER, Token, currencyEquals } from '@hybridx-exchange/hybridx-sdk'
+import { Currency, ETHER, Token, currencyEquals, ChainId } from '@hybridx-exchange/hybridx-sdk'
 import { useMemo } from 'react'
 import { useSelectedTokenList } from '../state/lists/hooks'
 import { NEVER_RELOAD, useSingleCallResult } from '../state/multicall/hooks'
@@ -101,8 +101,8 @@ export function useToken(tokenAddress?: string): Token | undefined | null {
   ])
 }
 
-export function useCurrency(currencyId: string | undefined): Currency | null | undefined {
-  const isETH = currencyId?.toUpperCase() === 'ROSE'
+export function useCurrency(currencyId: string | undefined, chainId: ChainId | undefined): Currency | null | undefined {
+  const isETH = chainId && currencyId?.toUpperCase() === ETHER[chainId].symbol
   const token = useToken(isETH ? undefined : currencyId)
-  return isETH ? ETHER : token
+  return chainId ? (isETH ? ETHER[chainId] : token) : undefined
 }

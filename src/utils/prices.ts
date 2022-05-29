@@ -43,14 +43,15 @@ export function computeTradePriceBreakdown(
   const priceImpactWithoutFeePercent = priceImpactWithoutFeeFraction
     ? new Percent(priceImpactWithoutFeeFraction?.numerator, priceImpactWithoutFeeFraction?.denominator)
     : undefined
-
+  const chainId = swap?.route?.chainId
   // the amount of the input that accrues to LPs
   const realizedLPFeeAmount =
     realizedLPFee &&
     swap &&
+    chainId &&
     (swap.inputAmount instanceof TokenAmount
       ? new TokenAmount(swap.inputAmount.token, realizedLPFee.multiply(swap.inputAmount.raw).quotient)
-      : CurrencyAmount.ether(realizedLPFee.multiply(swap.inputAmount.raw).quotient))
+      : CurrencyAmount.ether(realizedLPFee.multiply(swap.inputAmount.raw).quotient, chainId))
   //console.log(realizedLPFee?.toSignificant(6), realizedLPFeeAmount?.toSignificant())
   return { priceImpactWithoutFee: priceImpactWithoutFeePercent, realizedLPFee: realizedLPFeeAmount }
 }

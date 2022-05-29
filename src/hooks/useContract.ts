@@ -81,12 +81,20 @@ export function useOrderNFTContract(orderNFTAddress?: string, withSignerIfPossib
   return useContract(orderNFTAddress, IOrderNFTABI, withSignerIfPossible)
 }
 
-export function useOrderBookFactoryContract(withSignerIfPossible?: boolean): Contract | null {
-  return useContract(ORDER_BOOK_FACTORY_ADDRESS, IOrderBookFactoryABI, withSignerIfPossible)
+export function useOrderBookFactoryContract(withSignerIfPossible?: boolean, chainId?: ChainId): Contract | null {
+  return useContract(
+    chainId ? ORDER_BOOK_FACTORY_ADDRESS[chainId] : undefined,
+    IOrderBookFactoryABI,
+    withSignerIfPossible
+  )
 }
 
-export function useOrderBookRouterContract(withSignerIfPossible?: boolean): Contract | null {
-  return useContract(ORDER_BOOK_ROUTER_ADDRESS, IOrderBookRouterABI, withSignerIfPossible)
+export function useOrderBookRouterContract(withSignerIfPossible?: boolean, chainId?: ChainId): Contract | null {
+  return useContract(
+    chainId ? ORDER_BOOK_ROUTER_ADDRESS[chainId] : undefined,
+    IOrderBookRouterABI,
+    withSignerIfPossible
+  )
 }
 
 export function useMulticallContract(): Contract | null {

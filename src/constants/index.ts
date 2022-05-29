@@ -4,9 +4,24 @@ import { AbstractConnector } from '@web3-react/abstract-connector'
 //import { fortmatic, injected, portis, walletconnect, walletlink } from '../connectors'
 import { injected /*, walletconnect*/ } from '../connectors'
 
-export const PAIR_ROUTER_ADDRESS = '0x5bA75073797af99B5CE6cf8B22778E700D893139'
-export const PAIR_UTILS_ADDRESS = '0x2B986Be12d8f469D62D11FeC94217230E225f9de'
-export const ORDER_BOOK_ROUTER_ADDRESS = '0x43364ae809A4AD01a1281FD0709E4755ec76Be94'
+export const PAIR_ROUTER_ADDRESS = {
+  [ChainId.TESTNET]: '0x5bA75073797af99B5CE6cf8B22778E700D893139',
+  [ChainId.MAINNET]: '',
+  [ChainId.OPTIMISM_TESTNET]: '0xC7e59331C44c2134899270a9483c4eA95768ed64',
+  [ChainId.OPTIMISM_MAINNET]: ''
+}
+export const PAIR_UTILS_ADDRESS = {
+  [ChainId.TESTNET]: '0x2B986Be12d8f469D62D11FeC94217230E225f9de',
+  [ChainId.MAINNET]: '',
+  [ChainId.OPTIMISM_TESTNET]: '0x158d463D6BD06FF6A7D7432fb70F574624e2664b',
+  [ChainId.OPTIMISM_MAINNET]: ''
+}
+export const ORDER_BOOK_ROUTER_ADDRESS = {
+  [ChainId.TESTNET]: '0x43364ae809A4AD01a1281FD0709E4755ec76Be94',
+  [ChainId.MAINNET]: '',
+  [ChainId.OPTIMISM_TESTNET]: '0x6619F6951d85Ed163f7698Dd927B38E0883b7E56',
+  [ChainId.OPTIMISM_MAINNET]: ''
+}
 
 export const DEFAULT_LIMIT_SIZE = 8
 export const ZERO_ADDRESS = '0x0000000000000000000000000000000000000000'
@@ -21,7 +36,9 @@ export const OUSD = new Token(ChainId.TESTNET, '0x1a56ED83b3773f662Fe2C471F6a395
 
 const WETH_ONLY: ChainTokenList = {
   [ChainId.MAINNET]: [WETH[ChainId.MAINNET]],
-  [ChainId.TESTNET]: [WETH[ChainId.TESTNET]]
+  [ChainId.TESTNET]: [WETH[ChainId.TESTNET]],
+  [ChainId.OPTIMISM_TESTNET]: [WETH[ChainId.OPTIMISM_TESTNET]],
+  [ChainId.OPTIMISM_MAINNET]: [WETH[ChainId.OPTIMISM_MAINNET]]
 }
 
 // used to construct intermediary pairs for trading
@@ -111,6 +128,6 @@ export const PRICE_IMPACT_WITHOUT_FEE_CONFIRM_MIN: Percent = new Percent(JSBI.Bi
 // for non expert mode disable swaps above this
 export const BLOCKED_PRICE_IMPACT_NON_EXPERT: Percent = new Percent(JSBI.BigInt(1500), BIPS_BASE) // 15%
 
-// used to ensure the user doesn't send so much ROSE so they end up with <.01
+// used to ensure the user doesn't send so much ETH so they end up with <.01
 export const MIN_ETH: JSBI = JSBI.exponentiate(JSBI.BigInt(10), JSBI.BigInt(16)) // .01 ETH
 export const BETTER_TRADE_LINK_THRESHOLD = new Percent(JSBI.BigInt(75), JSBI.BigInt(10000))

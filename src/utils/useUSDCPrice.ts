@@ -29,7 +29,7 @@ export default function useUSDCPrice(currency?: Currency): Price | undefined {
     if (!currency || !wrapped || !chainId) {
       return undefined
     }
-    // handle wrose/rose
+    // handle WETH/ETH
     if (wrapped.equals(WETH[chainId])) {
       if (usdcPair) {
         const price = usdcPair.priceOf(WETH[chainId])
@@ -45,7 +45,9 @@ export default function useUSDCPrice(currency?: Currency): Price | undefined {
 
     const ethPairETHAmount = ethPair?.reserveOf(WETH[chainId])
     const ethPairETHUSDCValue: JSBI =
-      ethPairETHAmount && usdcEthPair ? usdcEthPair.priceOf(WETH[chainId]).quote(ethPairETHAmount).raw : JSBI.BigInt(0)
+      ethPairETHAmount && usdcEthPair
+        ? usdcEthPair.priceOf(WETH[chainId]).quote(ethPairETHAmount, chainId).raw
+        : JSBI.BigInt(0)
 
     // all other tokens
     // first try the usdc pair

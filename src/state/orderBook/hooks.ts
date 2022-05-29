@@ -31,7 +31,7 @@ export function useDerivedOrderBookInfo(
   noLiquidity?: boolean
   error?: string
 } {
-  const { account } = useActiveWeb3React()
+  const { account, chainId } = useActiveWeb3React()
 
   const { priceStepValue, minAmountValue } = useOrderBookState()
 
@@ -64,8 +64,16 @@ export function useDerivedOrderBookInfo(
   }
 
   // amounts
-  const priceStepAmount: CurrencyAmount | undefined = tryParseAmount(priceStepValue, currencies[Field.CURRENCY_QUOTE])
-  const minAmountAmount: CurrencyAmount | undefined = tryParseAmount(minAmountValue, currencies[Field.CURRENCY_BASE])
+  const priceStepAmount: CurrencyAmount | undefined = tryParseAmount(
+    priceStepValue,
+    currencies[Field.CURRENCY_QUOTE],
+    chainId
+  )
+  const minAmountAmount: CurrencyAmount | undefined = tryParseAmount(
+    minAmountValue,
+    currencies[Field.CURRENCY_BASE],
+    chainId
+  )
 
   let error: string | undefined
   if (!account) {

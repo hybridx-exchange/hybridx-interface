@@ -10,7 +10,9 @@ import {
   TokenAmount,
   Trade,
   TradeType,
-  ZERO
+  ZERO,
+  ETHER,
+  ChainId
 } from '@hybridx-exchange/hybridx-sdk'
 import { ParsedQs } from 'qs'
 import { useCallback, useEffect, useMemo, useState } from 'react'
@@ -67,8 +69,8 @@ export function useTradeActionHandlers(): {
 }
 
 // try to parse a user entered amount for a given token
-export function tryParseAmount(value?: string, currency?: Currency): CurrencyAmount | undefined {
-  if (!value || !currency) {
+export function tryParseAmount(value?: string, currency?: Currency, chainId?: ChainId): CurrencyAmount | undefined {
+  if (!value || !currency || !chainId) {
     return undefined
   }
   try {
@@ -76,7 +78,7 @@ export function tryParseAmount(value?: string, currency?: Currency): CurrencyAmo
     if (typedValueParsed !== '0') {
       return currency instanceof Token
         ? new TokenAmount(currency, JSBI.BigInt(typedValueParsed))
-        : CurrencyAmount.ether(JSBI.BigInt(typedValueParsed))
+        : CurrencyAmount.ether(JSBI.BigInt(typedValueParsed), chainId)
     }
   } catch (error) {
     // should fail if the user specifies too many decimal places of precision (or maybe exceed max uint?)
@@ -140,8 +142,8 @@ export function useDerivedTradeInfo(
     [Field.CURRENCY_B]: relevantTokenBalances[1]
   }
 
-  const parsedAmountAmount = tryParseAmount(typedAmountValue, currencyA)
-  const parsedPriceAmount = tryParseAmount(typedPriceValue, orderBook?.quoteToken.currency)
+  const parsedAmountAmount = tryParseAmount(typedAmountValue, currencyA, chainId)
+  const parsedPriceAmount = tryParseAmount(typedPriceValue, orderBook?.quoteToken.currency, chainId)
   const tradeRet = useTradeRet(type, tokenIn, tokenOut, parsedAmountAmount, parsedPriceAmount)
 
   // pair
@@ -231,14 +233,14 @@ export function useDerivedTradeInfo(
   }
 }
 
-function parseCurrencyFromURLParameter(urlParam: any): string {
+function parseCurrencyFromURLParameter(urlParam: any, chainId: ChainId): string {
   if (typeof urlParam === 'string') {
     const valid = isAddress(urlParam)
     if (valid) return valid
-    if (urlParam.toUpperCase() === 'ROSE') return 'ROSE'
-    if (valid === false) return 'ROSE'
+    if (urlParam.toUpperCase() === ETHER[chainId].symbol) return ETHER[chainId].symbol ?? ''
+    if (valid === false) return ETHER[chainId].symbol ?? ''
   }
-  return 'ROSE'
+  return ETHER[chainId].symbol ?? ''
 }
 
 function parseTokenAmountURLParameter(urlParam: any): string {
@@ -257,10 +259,11 @@ function validatedRecipient(recipient: any): string | null {
 }
 
 export function queryParametersToTradeState(
-  parsedQs: ParsedQs
+  parsedQs: ParsedQs,
+  chainId: ChainId
 ): { currencyIdA: string; currencyIdB: string; tradeState: TradeState } {
-  let currencyA = parseCurrencyFromURLParameter(parsedQs.currencyA)
-  let currencyB = parseCurrencyFromURLParameter(parsedQs.currencyB)
+  let currencyA = parseCurrencyFromURLParameter(parsedQs.currencyA, chainId)
+  let currencyB = parseCurrencyFromURLParameter(parsedQs.currencyB, chainId)
   if (currencyA === currencyB) {
     if (typeof parsedQs.currencyB === 'string') {
       currencyA = ''
@@ -296,7 +299,7 @@ export function useDefaultsFromURLSearch():
 
   useEffect(() => {
     if (!chainId) return
-    const parsed = queryParametersToTradeState(parsedQs)
+    const parsed = queryParametersToTradeState(parsedQs, chainId)
 
     dispatch(
       replaceTradeState({

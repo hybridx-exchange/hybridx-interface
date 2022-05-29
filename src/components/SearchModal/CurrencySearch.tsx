@@ -66,9 +66,19 @@ export function CurrencySearch({
   }, [isAddressSearch])
 
   const showETH: boolean = useMemo(() => {
-    const s = searchQuery.toLowerCase().trim()
-    return s === '' || s === 'e' || s === 'et' || s === 'rose'
-  }, [searchQuery])
+    const s = searchQuery.toUpperCase().trim()
+    if (chainId) {
+      const ethSymbol = ETHER[chainId].symbol
+      for (let i = 0; ethSymbol && i < ethSymbol.length; i++) {
+        if (s === ethSymbol.substring(0, i)) {
+          return true
+        }
+      }
+      return false
+    }
+
+    return false
+  }, [searchQuery, chainId])
 
   const tokenComparator = useTokenComparator(invertSearchOrder)
 
@@ -119,9 +129,9 @@ export function CurrencySearch({
   const handleEnter = useCallback(
     (e: KeyboardEvent<HTMLInputElement>) => {
       if (e.key === 'Enter') {
-        const s = searchQuery.toLowerCase().trim()
-        if (s === 'rose') {
-          handleCurrencySelect(ETHER)
+        const s = searchQuery.toUpperCase().trim()
+        if (chainId && s === ETHER[chainId].symbol) {
+          handleCurrencySelect(ETHER[chainId])
         } else if (filteredSortedTokens.length > 0) {
           if (
             filteredSortedTokens[0].symbol?.toLowerCase() === searchQuery.trim().toLowerCase() ||

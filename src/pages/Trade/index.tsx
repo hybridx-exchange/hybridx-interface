@@ -2,6 +2,7 @@ import {
   BigintIsh,
   Currency,
   CurrencyAmount,
+  ETHER,
   JSBI,
   parseBigintIsh,
   TokenAmount,
@@ -69,7 +70,10 @@ export default function DoTrade({
 
   // trade state
   const { typedAmountValue, typedPriceValue, recipient, selectedType } = useTradeState()
-  const [loadedCurrencyA, loadedCurrencyB] = [useCurrency(currencyIdA ?? 'ROSE'), useCurrency(currencyIdB)]
+  const [loadedCurrencyA, loadedCurrencyB] = [
+    useCurrency(currencyIdA ?? (chainId ? ETHER[chainId].symbol : undefined), chainId),
+    useCurrency(currencyIdB, chainId)
+  ]
   const {
     trade,
     currencyBalances,
@@ -98,13 +102,13 @@ export default function DoTrade({
       const tradeType = trade?.tradeType
       if (tradeType && trade?.baseToken && trade?.quoteToken && minAmount) {
         if (tradeType === TradeType.LIMIT_BUY) {
-          const amountAmount = tryParseAmount(value, trade?.quoteToken)
+          const amountAmount = tryParseAmount(value, trade?.quoteToken, chainId)
           const minQuoteAmount = parsedPriceAmount ? trade?.orderBook.getMinQuoteAmount(parsedPriceAmount?.raw) : ZERO
           if (amountAmount && JSBI.LT(amountAmount?.raw, minQuoteAmount)) {
             value = new TokenAmount(trade.quoteToken, minQuoteAmount).toSignificant()
           }
         } else if (tradeType === TradeType.LIMIT_SELL) {
-          const amountAmount = tryParseAmount(value, trade?.baseToken)
+          const amountAmount = tryParseAmount(value, trade?.baseToken, chainId)
           if (amountAmount && JSBI.LT(amountAmount?.raw, parseBigintIsh(minAmount as BigintIsh))) {
             value = new TokenAmount(trade.baseToken, minAmount).toSignificant()
           }
@@ -152,7 +156,10 @@ export default function DoTrade({
   })
 
   // check whether the user has approved the router on the input token
-  const [approval, approveCallback] = useApproveCallback(parsedAmountAmount, ORDER_BOOK_ROUTER_ADDRESS)
+  const [approval, approveCallback] = useApproveCallback(
+    parsedAmountAmount,
+    chainId ? ORDER_BOOK_ROUTER_ADDRESS[chainId] : undefined
+  )
 
   // check if user has gone through approval process, used to show two step buttons, reset on token change
   const [approvalSubmitted, setApprovalSubmitted] = useState<boolean>(false)
@@ -183,7 +190,7 @@ export default function DoTrade({
     }
   }, [wrappedCurrencyA, wrappedCurrencyB, currencyIdA, history])
 
-  const maxAmountInput: CurrencyAmount | undefined = maxAmountSpend(currencyBalances[Field.CURRENCY_A])
+  const maxAmountInput: CurrencyAmount | undefined = maxAmountSpend(currencyBalances[Field.CURRENCY_A], chainId)
   const atMaxAmountInput = Boolean(maxAmountInput && parsedAmounts[Input.AMOUNT]?.equalTo(maxAmountInput))
 
   // the callback to execute the trade
@@ -268,7 +275,7 @@ export default function DoTrade({
 
   const handleCurrencyASelect = useCallback(
     (currencyA: Currency) => {
-      const newCurrencyIdA = currencyId(currencyA)
+      const newCurrencyIdA = currencyId(currencyA, chainId)
       const newWrappedCurrencyA = wrappedCurrency(currencyA, chainId)
       if (newWrappedCurrencyA?.address === wrappedCurrencyB?.address) {
         if (wrappedCurrencyA?.address === newWrappedCurrencyA?.address) {
@@ -284,7 +291,7 @@ export default function DoTrade({
   )
   const handleCurrencyBSelect = useCallback(
     (currencyB: Currency) => {
-      const newCurrencyIdB = currencyId(currencyB)
+      const newCurrencyIdB = currencyId(currencyB, chainId)
       const newWrappedCurrencyB = wrappedCurrency(currencyB, chainId)
       if (newWrappedCurrencyB?.address === wrappedCurrencyA?.address) {
         if (newWrappedCurrencyB?.address === wrappedCurrencyB?.address) {
@@ -293,7 +300,7 @@ export default function DoTrade({
           history.push(`/trade/${newCurrencyIdB}/${currencyIdB}`)
         }
       } else {
-        history.push(`/trade/${currencyIdA ?? 'ROSE'}/${newCurrencyIdB}`)
+        history.push(`/trade/${currencyIdA ?? (chainId ? ETHER[chainId].symbol : undefined)}/${newCurrencyIdB}`)
       }
     },
     [currencyIdA, wrappedCurrencyA, wrappedCurrencyB, history, currencyIdB, chainId]

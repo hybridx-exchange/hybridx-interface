@@ -1,4 +1,4 @@
-import { Currency, CurrencyAmount, currencyEquals, ETHER, Token } from '@hybridx-exchange/hybridx-sdk'
+import { ChainId, Currency, CurrencyAmount, currencyEquals, ETHER, Token } from '@hybridx-exchange/hybridx-sdk'
 import React, { CSSProperties, MutableRefObject, useCallback, useMemo } from 'react'
 import { FixedSizeList } from 'react-window'
 import { Text } from 'rebass'
@@ -17,8 +17,12 @@ import { FadedSpan, MenuItem } from './styleds'
 import Loader from '../Loader'
 import { isTokenOnList } from '../../utils'
 
-function currencyKey(currency: Currency): string {
-  return currency instanceof Token ? currency.address : currency === ETHER ? 'ROSE' : ''
+function currencyKey(currency: Currency, chainId: ChainId | undefined): string {
+  return currency instanceof Token
+    ? currency.address
+    : chainId && currency === ETHER[chainId]
+    ? ETHER[chainId].symbol ?? ''
+    : ''
 }
 
 const StyledBalanceText = styled(Text)`
@@ -94,7 +98,7 @@ function CurrencyRow({
   style: CSSProperties
 }) {
   const { account, chainId } = useActiveWeb3React()
-  const key = currencyKey(currency)
+  const key = currencyKey(currency, chainId)
   const selectedTokenList = useSelectedTokenList()
   const isOnSelectedList = isTokenOnList(selectedTokenList, currency)
   const customAdded = useIsUserAddedToken(currency)
@@ -172,7 +176,7 @@ export default function CurrencyList({
   showETH: boolean
 }) {
   const itemData = useMemo(() => (showETH ? [Currency.ETHER, ...currencies] : currencies), [currencies, showETH])
-
+  const { chainId } = useActiveWeb3React()
   const Row = useCallback(
     ({ data, index, style }) => {
       const currency: Currency = data[index]
@@ -192,7 +196,7 @@ export default function CurrencyList({
     [onCurrencySelect, otherCurrency, selectedCurrency]
   )
 
-  const itemKey = useCallback((index: number, data: any) => currencyKey(data[index]), [])
+  const itemKey = useCallback((index: number, data: any) => currencyKey(data[index], chainId), [])
 
   return (
     <FixedSizeList

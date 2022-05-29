@@ -1,4 +1,4 @@
-import { ChainId } from '@hybridx-exchange/hybridx-sdk'
+import {ChainId, ETHER} from '@hybridx-exchange/hybridx-sdk'
 import React from 'react'
 import { isMobile } from 'react-device-detect'
 import { Text } from 'rebass'
@@ -139,7 +139,9 @@ const BalanceText = styled(Text)`
 
 const NETWORK_LABELS: { [chainId in ChainId]: string | null } = {
   [ChainId.MAINNET]: null,
-  [ChainId.TESTNET]: 'Emerald-Testnet'
+  [ChainId.TESTNET]: 'Emerald-Testnet',
+  [ChainId.OPTIMISM_MAINNET]: null,
+  [ChainId.OPTIMISM_TESTNET]: 'Optimism-Kovan'
 }
 
 export default function Header() {
@@ -170,7 +172,7 @@ export default function Header() {
             <AccountElement active={!!account} style={{ pointerEvents: 'auto' }}>
               {account && userEthBalance ? (
                 <BalanceText style={{ flexShrink: 0 }} pl="0.75rem" pr="0.5rem" fontWeight={500}>
-                  {userEthBalance?.toSignificant(4)} ROSE
+                  {userEthBalance?.toSignificant(4)} {chainId ? ETHER[chainId].symbol : ''}
                 </BalanceText>
               ) : null}
               <Web3Status />

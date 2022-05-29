@@ -1,4 +1,4 @@
-import { Currency, ETHER, Token } from '@hybridx-exchange/hybridx-sdk'
+import { Currency, ETHER, Token, ChainId } from '@hybridx-exchange/hybridx-sdk'
 import React, { useMemo } from 'react'
 import styled from 'styled-components'
 
@@ -24,17 +24,19 @@ const StyledLogo = styled(Logo)<{ size: string }>`
 
 export default function CurrencyLogo({
   currency,
+  chainId,
   size = '24px',
   style
 }: {
   currency?: Currency
+  chainId?: ChainId
   size?: string
   style?: React.CSSProperties
 }) {
   const uriLocations = useHttpLocations(currency instanceof WrappedTokenInfo ? currency.logoURI : undefined)
 
   const srcs: string[] = useMemo(() => {
-    if (currency === ETHER) return []
+    if (!chainId || currency === ETHER[chainId]) return []
 
     if (currency instanceof Token) {
       if (currency instanceof WrappedTokenInfo) {
@@ -44,9 +46,9 @@ export default function CurrencyLogo({
       return [getTokenLogoURL(currency.address)]
     }
     return []
-  }, [currency, uriLocations])
+  }, [currency, uriLocations, chainId])
 
-  if (currency === ETHER) {
+  if (chainId && currency === ETHER[chainId]) {
     return <StyledEthereumLogo src={EthereumLogo} size={size} style={style} />
   }
 

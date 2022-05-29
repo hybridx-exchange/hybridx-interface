@@ -118,6 +118,7 @@ export default function FullOrderCard({ order, border }: OrderCardProps) {
   const currencyBase = order.baseToken
   const currencyQuote = order.quoteToken
   const currencyAmount = order.orderType === TradeType.LIMIT_BUY ? currencyQuote : currencyBase
+  const chainId = currencyBase.chainId
   const [showMore, setShowMore] = useState(false)
 
   return (
@@ -199,14 +200,14 @@ export default function FullOrderCard({ order, border }: OrderCardProps) {
             <RowBetween marginTop="10px">
               <ButtonSecondary
                 as={Link}
-                to={`/trade/${currencyId(currencyQuote)}/${currencyId(currencyBase)}`}
+                to={`/trade/${currencyId(currencyQuote, chainId)}/${currencyId(currencyBase, chainId)}`}
                 width="30%"
               >
                 Buy
               </ButtonSecondary>
               <ButtonSecondary
                 as={Link}
-                to={`/trade/${currencyId(currencyBase)}/${currencyId(currencyQuote)}`}
+                to={`/trade/${currencyId(currencyBase, chainId)}/${currencyId(currencyQuote, chainId)}`}
                 width="30%"
               >
                 Sell
@@ -214,7 +215,9 @@ export default function FullOrderCard({ order, border }: OrderCardProps) {
               <ButtonSecondary
                 as={Link}
                 width="30%"
-                to={`/remove/${currencyId(currencyBase)}/${currencyId(currencyQuote)}/${order.orderId}`}
+                to={`/remove/${currencyId(currencyBase, chainId)}/${currencyId(currencyQuote, chainId)}/${
+                  order.orderId
+                }`}
               >
                 Remove
               </ButtonSecondary>

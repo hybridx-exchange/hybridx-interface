@@ -31,8 +31,11 @@ export default function RemoveOrder({
     params: { currencyIdA, currencyIdB, orderId }
   }
 }: RouteComponentProps<{ currencyIdA: string; currencyIdB: string; orderId: string }>) {
-  const [currencyA, currencyB] = [useCurrency(currencyIdA) ?? undefined, useCurrency(currencyIdB) ?? undefined]
   const { account, chainId, library } = useActiveWeb3React()
+  const [currencyA, currencyB] = [
+    useCurrency(currencyIdA, chainId) ?? undefined,
+    useCurrency(currencyIdB, chainId) ?? undefined
+  ]
 
   const theme = useContext(ThemeContext)
 
