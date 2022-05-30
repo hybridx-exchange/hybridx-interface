@@ -6,6 +6,7 @@ import { PortisConnector } from '@web3-react/portis-connector'
 
 import { FortmaticConnector } from './Fortmatic'
 import { NetworkConnector } from './NetworkConnector'
+import { ChainId } from '@hybridx-exchange/hybridx-sdk'
 
 const NETWORK_URL = process.env.REACT_APP_NETWORK_URL
 const FORMATIC_KEY = process.env.REACT_APP_FORTMATIC_KEY
@@ -27,7 +28,7 @@ export function getNetworkLibrary(): Web3Provider {
 }
 
 export const injected = new InjectedConnector({
-  supportedChainIds: [/*42262, */ 42261]
+  supportedChainIds: [ChainId.TESTNET, ChainId.OPTIMISM_TESTNET]
 })
 
 // mainnet only
