@@ -129,7 +129,7 @@ export default function AddLiquidity({
 
   async function onAdd() {
     if (!chainId || !library || !account) return
-    const router = getPairRouterContract(chainId, library, account)
+    const router = getPairRouterContract(library, account, chainId)
 
     const { [Field.CURRENCY_A]: parsedAmountA, [Field.CURRENCY_B]: parsedAmountB } = parsedAmounts
     if (!parsedAmountA || !parsedAmountB || !currencyA || !currencyB) {

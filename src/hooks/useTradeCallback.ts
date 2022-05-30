@@ -52,7 +52,7 @@ function useTradeCallArguments(
   return useMemo(() => {
     if (!trade || !recipient || !library || !account || !chainId) return []
 
-    const contract: Contract | null = getOrderBookRouterContract(chainId, library, account)
+    const contract: Contract | null = getOrderBookRouterContract(library, account, chainId)
     if (!contract) {
       return []
     }

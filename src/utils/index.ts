@@ -103,18 +103,12 @@ export function getContract(address: string, ABI: any, library: Web3Provider, ac
 }
 
 // account is optional
-export function getPairRouterContract(
-  _: number,
-  library: Web3Provider,
-  account?: string,
-  chainId?: ChainId
-): Contract | null {
+export function getPairRouterContract(library: Web3Provider, account?: string, chainId?: ChainId): Contract | null {
   return chainId ? getContract(PAIR_ROUTER_ADDRESS[chainId], IPairRouterABI, library, account) : null
 }
 
 // account is optional
 export function getOrderBookFactoryContract(
-  _: number,
   library: Web3Provider,
   account?: string,
   chainId?: ChainId
@@ -124,7 +118,6 @@ export function getOrderBookFactoryContract(
 
 // account is optional
 export function getOrderBookRouterContract(
-  _: number,
   library: Web3Provider,
   account?: string,
   chainId?: ChainId

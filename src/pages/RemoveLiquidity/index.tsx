@@ -196,7 +196,7 @@ export default function RemoveLiquidity({
     if (!currencyAmountA || !currencyAmountB) {
       throw new Error('missing currency amounts')
     }
-    const router = getPairRouterContract(chainId, library, account)
+    const router = getPairRouterContract(library, account, chainId)
 
     const amountsMin = {
       [Field.CURRENCY_A]: calculateSlippageAmount(currencyAmountA, allowedSlippage)[0],

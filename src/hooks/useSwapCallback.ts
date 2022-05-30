@@ -55,7 +55,7 @@ function useSwapCallArguments(
     const tradeVersion = Version.v2
     if (!swap || !recipient || !library || !account || !tradeVersion || !chainId) return []
 
-    const contract: Contract | null = getPairRouterContract(chainId, library, account)
+    const contract: Contract | null = getPairRouterContract(library, account, chainId)
     if (!contract) {
       return []
     }
@@ -100,7 +100,6 @@ export function useSwapCallback(
   const { account, chainId, library } = useActiveWeb3React()
 
   const swapCalls = useSwapCallArguments(swap, allowedSlippage, deadline, recipientAddressOrName)
-
   const addTransaction = useTransactionAdder()
 
   const { address: recipientAddress } = useENS(recipientAddressOrName)
