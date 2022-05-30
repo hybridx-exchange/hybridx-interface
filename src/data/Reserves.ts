@@ -35,7 +35,7 @@ export function usePairs(currencies: [Currency | undefined, Currency | undefined
       }),
     [tokens]
   )
-
+  //console.log(tokens, 'pair', pairAddresses) ==== pair不存在时会报错
   const results = useMultipleContractSingleData(pairAddresses, PAIR_INTERFACE, 'getReserves')
 
   return useMemo(() => {

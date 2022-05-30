@@ -41,7 +41,7 @@ export default function SwapModalHeader({
     flow.push([new TokenAmount(path[i], extra[i * 6 + 2]), new TokenAmount(path[i], extra[i * 6 + 4])])
     flow.push([new TokenAmount(path[i + 1], extra[i * 6 + 3]), new TokenAmount(path[i + 1], extra[i * 6 + 5])])
   }
-
+  //console.log(flow)
   return (
     <AutoColumn gap={'md'} style={{ marginTop: '20px' }}>
       {flow.map((e, i, flow) => {
