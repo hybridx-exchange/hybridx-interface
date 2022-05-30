@@ -31,14 +31,14 @@ export function isAddress(value: any): string | false {
 }
 
 const ETHERSCAN_PREFIXES: { [chainId in ChainId]: string } = {
-  [ChainId.MAINNET]: '',
-  [ChainId.TESTNET]: '.testnet',
-  [ChainId.OPTIMISM_TESTNET]: '',
-  [ChainId.OPTIMISM_MAINNET]: ''
+  [ChainId.MAINNET]: 'https://explorer.oasis.updev.si',
+  [ChainId.TESTNET]: 'https://explorer.testnet.oasis.updev.si',
+  [ChainId.OPTIMISM_TESTNET]: 'https://kovan-optimistic.etherscan.io',
+  [ChainId.OPTIMISM_MAINNET]: 'https://optimistic.etherscan.io'
 }
 
 export function getEtherscanLink(chainId: ChainId, data: string, type: 'transaction' | 'token' | 'address'): string {
-  const prefix = `https://explorer${ETHERSCAN_PREFIXES[chainId] || ETHERSCAN_PREFIXES[42262]}.oasis.updev.si`
+  const prefix = `${ETHERSCAN_PREFIXES[chainId] || ETHERSCAN_PREFIXES[ChainId.MAINNET]}`
 
   switch (type) {
     case 'transaction': {
