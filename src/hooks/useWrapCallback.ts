@@ -28,7 +28,11 @@ export default function useWrapCallback(
   const wethContract = useWETHContract()
   const balance = useCurrencyBalance(account ?? undefined, inputCurrency)
   // we can always parse the amount typed as the input currency, since wrapping is 1:1
-  const inputAmount = useMemo(() => tryParseAmount(typedValue, inputCurrency, chainId), [inputCurrency, typedValue])
+  const inputAmount = useMemo(() => tryParseAmount(typedValue, inputCurrency, chainId), [
+    inputCurrency,
+    typedValue,
+    chainId
+  ])
   const addTransaction = useTransactionAdder()
 
   return useMemo(() => {

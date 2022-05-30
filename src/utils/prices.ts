@@ -38,6 +38,16 @@ export function computeTradePriceBreakdown(
 
   // remove lp fees from price impact
   const priceImpactWithoutFeeFraction = swap && realizedLPFee ? swap.priceImpact.subtract(realizedLPFee) : undefined
+  console.log(
+    'amount',
+    swap?.inputAmount?.toSignificant(6),
+    swap?.inputAmount?.currency.symbol,
+    swap?.outputAmount?.toSignificant(6),
+    swap?.outputAmount?.currency.symbol
+  )
+  console.log('midPrice', swap?.route?.midPrice?.toSignificant(6))
+  console.log('priceImpace', swap?.priceImpact.toSignificant(6))
+  console.log('priceImpactWithoutFeeFraction', priceImpactWithoutFeeFraction?.toSignificant(6))
 
   // the x*y=k impact
   const priceImpactWithoutFeePercent = priceImpactWithoutFeeFraction

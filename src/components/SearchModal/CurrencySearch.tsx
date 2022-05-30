@@ -142,7 +142,7 @@ export function CurrencySearch({
         }
       }
     },
-    [filteredSortedTokens, handleCurrencySelect, searchQuery]
+    [filteredSortedTokens, handleCurrencySelect, searchQuery, chainId]
   )
 
   const selectedListInfo = useSelectedListInfo()

@@ -39,7 +39,7 @@ export function useETHBalances(
         if (chainId && value) memo[address] = CurrencyAmount.ether(JSBI.BigInt(value.toString()), chainId)
         return memo
       }, {}),
-    [addresses, results]
+    [addresses, results, chainId]
   )
 }
 

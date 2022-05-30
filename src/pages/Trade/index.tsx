@@ -116,7 +116,7 @@ export default function DoTrade({
       }
       onUserInput(Input.AMOUNT, value)
     },
-    [onUserInput, parsedPriceAmount, trade]
+    [onUserInput, parsedPriceAmount, trade, chainId]
   )
   const handleInputPrice = useCallback(
     (value: string) => {
