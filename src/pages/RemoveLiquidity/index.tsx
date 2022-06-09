@@ -121,7 +121,7 @@ export default function RemoveLiquidity({
       { name: 'verifyingContract', type: 'address' }
     ]
     const domain = {
-      name: 'Uniswap V2',
+      name: 'HybridX LP Token',
       version: '1',
       chainId: chainId,
       verifyingContract: pair.liquidityToken.address
@@ -135,7 +135,7 @@ export default function RemoveLiquidity({
     ]
     const message = {
       owner: account,
-      spender: PAIR_ROUTER_ADDRESS,
+      spender: chainId ? PAIR_ROUTER_ADDRESS[chainId] : undefined,
       value: liquidityAmount.raw.toString(),
       nonce: nonce.toHexString(),
       deadline: deadlineForSignature
