@@ -92,6 +92,7 @@ class MiniRpcProvider implements AsyncSendable {
     let json
     try {
       json = await response.json()
+      json = json?.length > 0 ? json : []
     } catch (error) {
       batch.forEach(({ reject }) => reject(new Error('Failed to parse JSON response')))
       return
@@ -100,6 +101,7 @@ class MiniRpcProvider implements AsyncSendable {
       memo[current.request.id] = current
       return memo
     }, {})
+
     for (const result of json) {
       const {
         resolve,
@@ -141,6 +143,7 @@ class MiniRpcProvider implements AsyncSendable {
       return `0x${this.chainId.toString(16)}`
     }
     const promise = new Promise((resolve, reject) => {
+      //console.log(resolve, reject)
       this.batch.push({
         request: {
           jsonrpc: '2.0',

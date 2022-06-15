@@ -28,6 +28,7 @@ function getRpcUrls(chainId: ChainId): [string] {
 // provider.request returns Promise<any>, but wallet_switchEthereumChain must return null or throw
 // see https://github.com/rekmarks/EIPs/blob/3326-create/EIPS/eip-3326.md for more info on wallet_switchEthereumChain
 export async function switchToNetwork({ provider, chainId }: SwitchNetworkArguments): Promise<null | void> {
+  //console.log(provider, chainId)
   if (!provider.request) {
     return
   }
@@ -39,7 +40,7 @@ export async function switchToNetwork({ provider, chainId }: SwitchNetworkArgume
     })
   } catch (error) {
     // 4902 is the error code for attempting to switch to an unrecognized chainId
-    if (error.code === 4902) {
+    if (error.code === 4902 || error.message.includes('Unsupported chain ID')) {
       const info = CHAIN_INFO[chainId]
 
       await provider.request({
