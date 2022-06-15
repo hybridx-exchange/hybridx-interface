@@ -1,6 +1,5 @@
-import { ChainId, ETHER } from '@hybridx-exchange/hybridx-sdk'
+import { ETHER } from '@hybridx-exchange/hybridx-sdk'
 import React from 'react'
-import { isMobile } from 'react-device-detect'
 import { Text } from 'rebass'
 
 import styled from 'styled-components'
@@ -16,12 +15,12 @@ import { useActiveWeb3React } from '../../hooks'
 import { useDarkModeManager } from '../../state/user/hooks'
 import { useETHBalances } from '../../state/wallet/hooks'
 
-import { YellowCard } from '../Card'
 import Settings from '../Settings'
 //import Menu from '../Menu'
 
 import Row, { RowBetween } from '../Row'
 import Web3Status from '../Web3Status'
+import NetworkSelector from './NetworkSelector'
 
 const HeaderFrame = styled.div`
   display: flex;
@@ -89,20 +88,6 @@ const AccountElement = styled.div<{ active: boolean }>`
   }
 `
 
-const TestnetWrapper = styled.div`
-  white-space: nowrap;
-  width: fit-content;
-  margin-left: 10px;
-  pointer-events: auto;
-`
-
-const NetworkCard = styled(YellowCard)`
-  width: fit-content;
-  margin-right: 10px;
-  border-radius: 12px;
-  padding: 8px 12px;
-`
-
 const UniIcon = styled.div`
   transition: transform 0.3s ease;
   :hover {
@@ -137,13 +122,6 @@ const BalanceText = styled(Text)`
   `};
 `
 
-const NETWORK_LABELS: { [chainId in ChainId]: string | null } = {
-  [ChainId.MAINNET]: null,
-  [ChainId.TESTNET]: 'Emerald-Testnet',
-  [ChainId.OPTIMISM_MAINNET]: null,
-  [ChainId.OPTIMISM_TESTNET]: 'Optimism-Kovan'
-}
-
 export default function Header() {
   const { account, chainId } = useActiveWeb3React()
 
@@ -166,9 +144,9 @@ export default function Header() {
         </HeaderElement>
         <HeaderControls>
           <HeaderElement>
-            <TestnetWrapper>
-              {!isMobile && chainId && NETWORK_LABELS[chainId] && <NetworkCard>{NETWORK_LABELS[chainId]}</NetworkCard>}
-            </TestnetWrapper>
+            <HeaderElement>
+              <NetworkSelector />
+            </HeaderElement>
             <AccountElement active={!!account} style={{ pointerEvents: 'auto' }}>
               {account && userEthBalance ? (
                 <BalanceText style={{ flexShrink: 0 }} pl="0.75rem" pr="0.5rem" fontWeight={500}>

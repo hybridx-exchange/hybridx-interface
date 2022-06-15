@@ -1,4 +1,4 @@
-import optimismLogoUrl from 'assets/svg/optimistic_ethereum.svg'
+import optimismLogoUrl from '../assets/svg/optimistic_ethereum.svg'
 
 import { ChainId } from '@hybridx-exchange/hybridx-sdk'
 import { OPTIMISM_LIST, EMERALD_LIST } from './lists'

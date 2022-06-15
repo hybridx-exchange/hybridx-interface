@@ -1,6 +1,6 @@
 import { CHAIN_INFO } from '../../constants/chainInfo'
 import { ChainId } from '@hybridx-exchange/hybridx-sdk'
-import { useActiveWeb3React } from '../../hooks/index'
+import { useActiveWeb3ReactWithUnSupportChainId } from '../../hooks/index'
 import { useOnClickOutside } from '../../hooks/useOnClickOutside'
 import useParsedQueryString from '../../hooks/useParsedQueryString'
 import usePrevious from '../../hooks/usePrevious'
@@ -171,7 +171,7 @@ const ExplorerLabel = ({ chainId }: { chainId: ChainId }) => {
 }
 
 function Row({ targetChain, onSelectChain }: { targetChain: ChainId; onSelectChain: (targetChain: number) => void }) {
-  const { library, chainId } = useActiveWeb3React()
+  const { library, chainId } = useActiveWeb3ReactWithUnSupportChainId()
   if (!library || !chainId) {
     return null
   }
@@ -237,7 +237,7 @@ const getParsedChainId = (parsedQs?: ParsedQs) => {
 }
 
 export default function NetworkSelector() {
-  const { chainId, library } = useActiveWeb3React()
+  const { chainId, library } = useActiveWeb3ReactWithUnSupportChainId()
   const parsedQs = useParsedQueryString()
   const { urlChain, urlChainId } = getParsedChainId(parsedQs)
   const prevChainId = usePrevious(chainId)
@@ -248,7 +248,7 @@ export default function NetworkSelector() {
 
   const history = useHistory()
 
-  const info = chainId ? CHAIN_INFO[chainId] : undefined
+  const info = chainId && CHAIN_INFO[chainId] ? CHAIN_INFO[chainId] : CHAIN_INFO[ChainId.TESTNET]
 
   const dispatch = useDispatch()
 
@@ -261,7 +261,7 @@ export default function NetworkSelector() {
             toggle()
           }
           history.replace({
-            search: replaceURLParam(history.location.search, 'chain', getChainNameFromId(targetChain)),
+            search: replaceURLParam(history.location.search, 'chain', getChainNameFromId(targetChain))
           })
         })
         .catch(error => {
@@ -319,9 +319,7 @@ export default function NetworkSelector() {
             <FlyoutHeader>
               <TYPE.body>Select a network</TYPE.body>
             </FlyoutHeader>
-            <Row onSelectChain={handleChainSwitch} targetChain={ChainId.MAINNET} />
             <Row onSelectChain={handleChainSwitch} targetChain={ChainId.TESTNET} />
-            <Row onSelectChain={handleChainSwitch} targetChain={ChainId.OPTIMISM_MAINNET} />
             <Row onSelectChain={handleChainSwitch} targetChain={ChainId.OPTIMISM_TESTNET} />
           </FlyoutMenuContents>
         </FlyoutMenu>
