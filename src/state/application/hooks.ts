@@ -1,8 +1,17 @@
 import { useCallback, useMemo } from 'react'
 import { useActiveWeb3React } from '../../hooks'
-import { addPopup, PopupContent, removePopup, toggleWalletModal, toggleSettingsMenu } from './actions'
+import { addPopup, PopupContent, removePopup, toggleWalletModal, toggleSettingsMenu, toggleNetworkSelectorModal } from './actions'
 import { useSelector, useDispatch } from 'react-redux'
 import { AppState } from '../index'
+
+export function useNetworkSelectorModalOpen(): boolean {
+  return useSelector((state: AppState) => state.application.networkSelectorModalOpen)
+}
+
+export function useNetworkSelectorModalToggle(): () => void {
+  const dispatch = useDispatch()
+  return useCallback(() => dispatch(toggleNetworkSelectorModal()), [dispatch])
+}
 
 export function useBlockNumber(): number | undefined {
   const { chainId } = useActiveWeb3React()

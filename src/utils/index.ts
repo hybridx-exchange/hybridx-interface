@@ -19,7 +19,6 @@ import {
   ORDER_BOOK_FACTORY_ADDRESS
 } from '@hybridx-exchange/hybridx-sdk'
 import { TokenAddressMap } from '../state/lists/hooks'
-import { injected } from '../connectors'
 
 // returns the checksummed address if the address is valid, otherwise returns false
 export function isAddress(value: any): string | false {
@@ -138,7 +137,7 @@ export function getOrderBook(orderBookAddress: string, library: Web3Provider, ac
   return getContract(orderBookAddress, IOrderBookABI, library, account)
 }
 
-export function addChain(chainId: ChainId) {
+/*export function addChain(chainId: ChainId) {
   const method = 'wallet_addEthereumChain'
   const params = [
     {
@@ -166,4 +165,4 @@ export function addChain(chainId: ChainId) {
       )
     }
   })
-}
+}*/

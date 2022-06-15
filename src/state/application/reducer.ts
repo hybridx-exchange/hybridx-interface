@@ -3,12 +3,11 @@ import {
   addPopup,
   PopupContent,
   removePopup,
+  toggleNetworkSelectorModal,
   toggleSettingsMenu,
   toggleWalletModal,
   updateBlockNumber
 } from './actions'
-import { addChain } from '../../utils'
-import { ChainId } from '@hybridx-exchange/hybridx-sdk'
 
 type PopupList = Array<{ key: string; show: boolean; content: PopupContent; removeAfterMs: number | null }>
 
@@ -17,13 +16,15 @@ export interface ApplicationState {
   popupList: PopupList
   walletModalOpen: boolean
   settingsMenuOpen: boolean
+  networkSelectorModalOpen: boolean
 }
 
 const initialState: ApplicationState = {
   blockNumber: {},
   popupList: [],
   walletModalOpen: false,
-  settingsMenuOpen: false
+  settingsMenuOpen: false,
+  networkSelectorModalOpen: false
 }
 
 export default createReducer(initialState, builder =>
@@ -38,9 +39,9 @@ export default createReducer(initialState, builder =>
     })
     .addCase(toggleWalletModal, state => {
       state.walletModalOpen = !state.walletModalOpen
-      if (state.walletModalOpen) {
-        addChain(ChainId.TESTNET)
-      }
+    })
+    .addCase(toggleNetworkSelectorModal, state => {
+      state.networkSelectorModalOpen = !state.networkSelectorModalOpen
     })
     .addCase(toggleSettingsMenu, state => {
       state.settingsMenuOpen = !state.settingsMenuOpen
