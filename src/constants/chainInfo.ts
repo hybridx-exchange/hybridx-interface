@@ -1,4 +1,5 @@
 import optimismLogoUrl from '../assets/svg/optimistic_ethereum.svg'
+import emeraldLogoUrl from '../assets/svg/emerald_logo.svg'
 
 import { ChainId } from '@hybridx-exchange/hybridx-sdk'
 import { OPTIMISM_LIST, EMERALD_LIST } from './lists'
@@ -34,7 +35,7 @@ export const CHAIN_INFO: ChainInfoMap = {
     explorer: 'https://explorer.emerald.oasis.dev',
     name: 'emerald',
     label: 'Emerald',
-    logoUrl: optimismLogoUrl,
+    logoUrl: emeraldLogoUrl,
     nativeCurrency: { name: 'ROSE', symbol: 'ROSE', decimals: 18 }
   },
   [ChainId.TESTNET]: {
@@ -44,7 +45,7 @@ export const CHAIN_INFO: ChainInfoMap = {
     explorer: 'https://testnet.explorer.emerald.oasis.dev',
     name: 'emerald_testnet',
     label: 'Emerald Testnet',
-    logoUrl: optimismLogoUrl,
+    logoUrl: emeraldLogoUrl,
     nativeCurrency: { name: 'ROSE', symbol: 'ROSE', decimals: 18 }
   },
   [ChainId.OPTIMISM_MAINNET]: {
