@@ -7,22 +7,18 @@ import { isMobile } from 'react-device-detect'
 import { injected } from '../connectors'
 import { NetworkContextName } from '../constants'
 
-export function useActiveWeb3React(): Web3ReactContextInterface<Web3Provider> & { chainId?: ChainId } & {
-  invalidChainId?: ChainId
-} {
+export function useActiveWeb3React(): Web3ReactContextInterface<Web3Provider> & { chainId?: ChainId } {
   const context = useWeb3ReactCore<Web3Provider>()
   const contextNetwork = useWeb3ReactCore<Web3Provider>(NetworkContextName)
-  return context.active
-    ? context
-    : contextNetwork.active && validChainId(contextNetwork.chainId)
-    ? contextNetwork
-    : context
+  if (!validChainId(contextNetwork.chainId)) {
+    contextNetwork.chainId = undefined
+  }
+
+  return context.active && validChainId(context.chainId) ? context : contextNetwork
 }
 
 export function useActiveWeb3ReactWithUnSupportChainId(): Web3ReactContextInterface<Web3Provider> & {
   chainId?: ChainId
-} & {
-  invalidChainId?: ChainId
 } {
   const context = useWeb3ReactCore<Web3Provider>()
   const contextNetwork = useWeb3ReactCore<Web3Provider>(NetworkContextName)

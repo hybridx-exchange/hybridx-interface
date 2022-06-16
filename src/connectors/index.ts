@@ -6,7 +6,6 @@ import { PortisConnector } from '@web3-react/portis-connector'
 
 import { FortmaticConnector } from './Fortmatic'
 import { NetworkConnector } from './NetworkConnector'
-import { ChainId } from '@hybridx-exchange/hybridx-sdk'
 import getLibrary from '../utils/getLibrary'
 
 const NETWORK_URL = process.env.REACT_APP_NETWORK_URL
@@ -28,9 +27,8 @@ export function getNetworkLibrary(): Web3Provider {
   return (networkLibrary = networkLibrary ?? getLibrary(network.provider))
 }
 
-export const injected = new InjectedConnector({
-  supportedChainIds: [ChainId.TESTNET, ChainId.OPTIMISM_TESTNET]
-})
+//export const injected = new InjectedConnector({ supportedChainIds: [1, 42261, 42262, 10, 69] })
+export const injected = new InjectedConnector({})
 
 // mainnet only
 export const walletconnect = new WalletConnectConnector({
@@ -55,7 +53,7 @@ export const portis = new PortisConnector({
 // mainnet only
 export const walletlink = new WalletLinkConnector({
   url: NETWORK_URL,
-  appName: 'Uniswap',
+  appName: 'HybridX',
   appLogoUrl:
     'https://mpng.pngfly.com/20181202/bex/kisspng-emoji-domain-unicorn-pin-badges-sticker-unicorn-tumblr-emoji-unicorn-iphoneemoji-5c046729264a77.5671679315437924251569.jpg'
 })

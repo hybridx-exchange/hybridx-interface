@@ -173,17 +173,18 @@ const ExplorerLabel = ({ chainId }: { chainId: ChainId }) => {
 
 function Row({ targetChain, onSelectChain }: { targetChain: ChainId; onSelectChain: (targetChain: number) => void }) {
   const { library, chainId } = useActiveWeb3ReactWithUnSupportChainId()
-  if (!library || !chainId) {
+  const curChainId = chainId ?? library ? library?._network?.chainId : chainId
+  if (!library || !curChainId) {
     return null
   }
-  const active = chainId === targetChain
+  const active = curChainId === targetChain
   const { explorer, bridge, label, logoUrl } = CHAIN_INFO[targetChain]
 
   const rowContent = (
     <FlyoutRow onClick={() => onSelectChain(targetChain)} active={active}>
       <Logo src={logoUrl} />
       <NetworkLabel>{label}</NetworkLabel>
-      {chainId === targetChain && (
+      {curChainId === targetChain && (
         <CircleContainer>
           <FlyoutRowActiveIndicator />
         </CircleContainer>
@@ -198,7 +199,7 @@ function Row({ targetChain, onSelectChain }: { targetChain: ChainId; onSelectCha
         <ActiveRowLinkList>
           {bridge && (
             <ExternalLink href={bridge}>
-              <BridgeLabel chainId={chainId} />
+              <BridgeLabel chainId={curChainId} />
               <CircleContainer>
                 <LinkOutCircle />
               </CircleContainer>
@@ -206,7 +207,7 @@ function Row({ targetChain, onSelectChain }: { targetChain: ChainId; onSelectCha
           )}
           {explorer && (
             <ExternalLink href={explorer}>
-              <ExplorerLabel chainId={chainId} />
+              <ExplorerLabel chainId={curChainId} />
               <CircleContainer>
                 <LinkOutCircle />
               </CircleContainer>
@@ -249,7 +250,8 @@ export default function NetworkSelector() {
 
   const history = useHistory()
 
-  const info = chainId && CHAIN_INFO[chainId] ? CHAIN_INFO[chainId] : CHAIN_INFO[ChainId.TESTNET]
+  const curChainId = chainId ?? library ? library?._network?.chainId : chainId
+  const info = curChainId && CHAIN_INFO[curChainId] ? CHAIN_INFO[curChainId] : CHAIN_INFO[ChainId.TESTNET]
 
   const dispatch = useDispatch()
 
@@ -270,8 +272,8 @@ export default function NetworkSelector() {
 
           // we want app network <-> chainId param to be in sync, so if user changes the network by changing the URL
           // but the request fails, revert the URL back to current chainId
-          if (chainId) {
-            history.replace({ search: replaceURLParam(history.location.search, 'chain', getChainNameFromId(chainId)) })
+          if (curChainId) {
+            history.replace({ search: replaceURLParam(history.location.search, 'chain', getChainNameFromId(curChainId)) })
           }
 
           if (!skipToggle) {
@@ -281,29 +283,29 @@ export default function NetworkSelector() {
           dispatch(addPopup({ content: { failedSwitchNetwork: targetChain }, key: `failed-network-switch` }))
         })
     },
-    [dispatch, library, toggle, history, chainId]
+    [dispatch, library, toggle, history, curChainId]
   )
 
   useEffect(() => {
-    if (!chainId || !prevChainId) return
+    if (!curChainId || !prevChainId) return
 
     // when network change originates from wallet or dropdown selector, just update URL
-    if (chainId !== prevChainId) {
-      history.replace({ search: replaceURLParam(history.location.search, 'chain', getChainNameFromId(chainId)) })
+    if (curChainId !== prevChainId) {
+      history.replace({ search: replaceURLParam(history.location.search, 'chain', getChainNameFromId(curChainId)) })
       // otherwise assume network change originates from URL
-    } else if (urlChainId && urlChainId !== chainId) {
+    } else if (urlChainId && urlChainId !== curChainId) {
       handleChainSwitch(urlChainId, true)
     }
-  }, [chainId, urlChainId, prevChainId, handleChainSwitch, history])
+  }, [curChainId, urlChainId, prevChainId, handleChainSwitch, history])
 
   // set chain parameter on initial load if not there
   useEffect(() => {
-    if (chainId && !urlChainId) {
-      history.replace({ search: replaceURLParam(history.location.search, 'chain', getChainNameFromId(chainId)) })
+    if (curChainId && !urlChainId) {
+      history.replace({ search: replaceURLParam(history.location.search, 'chain', getChainNameFromId(curChainId)) })
     }
-  }, [chainId, history, urlChainId, urlChain])
+  }, [curChainId, history, urlChainId, urlChain])
 
-  if (!chainId || !info || !library) {
+  if (!curChainId || !info || !library) {
     return null
   }
 
