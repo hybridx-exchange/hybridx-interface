@@ -16,6 +16,7 @@ import { replaceURLParam } from '../../utils/routes'
 
 import { switchToNetwork } from '../../utils/switchToNetwork'
 import { useDispatch } from 'react-redux'
+import ethereumLogoUrl from '../../assets/images/ethereum-logo.png'
 
 const ActiveRowLinkList = styled.div`
   display: flex;
@@ -251,7 +252,7 @@ export default function NetworkSelector() {
   const history = useHistory()
 
   const curChainId = chainId ?? library ? library?._network?.chainId : chainId
-  const info = curChainId && CHAIN_INFO[curChainId] ? CHAIN_INFO[curChainId] : CHAIN_INFO[ChainId.TESTNET]
+  const info = curChainId && CHAIN_INFO[curChainId] ? CHAIN_INFO[curChainId] : undefined
 
   const dispatch = useDispatch()
 
@@ -273,7 +274,9 @@ export default function NetworkSelector() {
           // we want app network <-> chainId param to be in sync, so if user changes the network by changing the URL
           // but the request fails, revert the URL back to current chainId
           if (curChainId) {
-            history.replace({ search: replaceURLParam(history.location.search, 'chain', getChainNameFromId(curChainId)) })
+            history.replace({
+              search: replaceURLParam(history.location.search, 'chain', getChainNameFromId(curChainId))
+            })
           }
 
           if (!skipToggle) {
@@ -305,15 +308,18 @@ export default function NetworkSelector() {
     }
   }, [curChainId, history, urlChainId, urlChain])
 
-  if (!curChainId || !info || !library) {
+  if (!curChainId || !library) {
     return null
   }
+
+  const logoUrl = info?.logoUrl ?? ethereumLogoUrl
+  const label = info?.label ?? library.network?.name ?? 'unknown'
 
   return (
     <SelectorWrapper ref={node as any} onMouseEnter={toggle} onMouseLeave={toggle}>
       <SelectorControls interactive>
-        <SelectorLogo interactive src={info.logoUrl} />
-        <SelectorLabel>{info.label}</SelectorLabel>
+        <SelectorLogo interactive src={logoUrl} />
+        <SelectorLabel>{label}</SelectorLabel>
         <StyledChevronDown />
       </SelectorControls>
       {open && (
