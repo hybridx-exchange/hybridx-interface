@@ -565,7 +565,7 @@ export function useTradeRet(
         priceToRaw
       ]
     } = returns[0].data
-    /*console.log(
+    console.log(
       ammAmountInRaw.toString(),
       ammAmountOutRaw.toString(),
       orderAmountInRaw.toString(),
@@ -574,7 +574,7 @@ export function useTradeRet(
       amountLeftRaw.toString(),
       amountExpectRaw.toString(),
       priceToRaw.toString()
-    )*/
+    )
     const ammAmountIn = tokenIn
       ? wrappedCurrencyAmount(new TokenAmount(tokenIn, ammAmountInRaw), tokenIn?.chainId)
       : undefined

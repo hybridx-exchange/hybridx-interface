@@ -313,7 +313,8 @@ export default function NetworkSelector() {
   }
 
   const logoUrl = info?.logoUrl ?? ethereumLogoUrl
-  const label = info?.label ?? library.network?.name ?? 'unknown'
+  const name = info?.label ?? library.network?.name ?? 'unknown'
+  const label = name.substring(0, 1).toUpperCase() + name.substring(1)
 
   return (
     <SelectorWrapper ref={node as any} onMouseEnter={toggle} onMouseLeave={toggle}>

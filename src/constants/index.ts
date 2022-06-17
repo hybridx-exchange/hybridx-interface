@@ -5,19 +5,19 @@ import { AbstractConnector } from '@web3-react/abstract-connector'
 import { injected /*, walletconnect*/ } from '../connectors'
 
 export const PAIR_ROUTER_ADDRESS = {
-  [ChainId.TESTNET]: '0x5bA75073797af99B5CE6cf8B22778E700D893139',
+  [ChainId.TESTNET]: '0x4A9Ce1F28744baEffc1224c68edC47b627478d6C',
   [ChainId.MAINNET]: '',
   [ChainId.OPTIMISM_TESTNET]: '0xF78B7dd3A3c95a3fF7bcf89Cfb5be526cBd7E32c',
   [ChainId.OPTIMISM_MAINNET]: ''
 }
 export const PAIR_UTILS_ADDRESS = {
-  [ChainId.TESTNET]: '0x2B986Be12d8f469D62D11FeC94217230E225f9de',
+  [ChainId.TESTNET]: '0x88869bb9544d34b2630a770D3c680c534B00149A',
   [ChainId.MAINNET]: '',
   [ChainId.OPTIMISM_TESTNET]: '0xd813Ca47eE871F2603A074838f567A26Db226b34',
   [ChainId.OPTIMISM_MAINNET]: ''
 }
 export const ORDER_BOOK_ROUTER_ADDRESS = {
-  [ChainId.TESTNET]: '0x43364ae809A4AD01a1281FD0709E4755ec76Be94',
+  [ChainId.TESTNET]: '0xdB553c2E5f2A4Fc4252791Ceac0DeA298C86f356',
   [ChainId.MAINNET]: '',
   [ChainId.OPTIMISM_TESTNET]: '0x5aD4dBcD96307A82b7C04b262916E4Fdf640e4D3',
   [ChainId.OPTIMISM_MAINNET]: ''
@@ -31,10 +31,9 @@ type ChainTokenList = {
   readonly [chainId in ChainId]: Token[]
 }
 
-export const USDC = new Token(ChainId.MAINNET, '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48', 6, 'USDC', 'USD//C')
 export const OUSD = {
   [ChainId.TESTNET]: new Token(ChainId.TESTNET, '0x1a56ED83b3773f662Fe2C471F6a3952432a4CFCd', 6, 'OUSD', 'OUSD'),
-  [ChainId.MAINNET]: null,
+  [ChainId.MAINNET]: new Token(ChainId.MAINNET, '0x1a56ED83b3773f662Fe2C471F6a3952432a4CFCd', 6, 'OUSD', 'OUSD'),
   [ChainId.OPTIMISM_TESTNET]: new Token(
     ChainId.OPTIMISM_TESTNET,
     '0x253E5C5F817770329E5e303902628F1F29a4C4CA',
@@ -42,7 +41,13 @@ export const OUSD = {
     'OUSD',
     'OUSD'
   ),
-  [ChainId.OPTIMISM_MAINNET]: null
+  [ChainId.OPTIMISM_MAINNET]: new Token(
+    ChainId.OPTIMISM_MAINNET,
+    '0x253E5C5F817770329E5e303902628F1F29a4C4CA',
+    18,
+    'OUSD',
+    'OUSD'
+  )
 }
 
 const WETH_ONLY: ChainTokenList = {
