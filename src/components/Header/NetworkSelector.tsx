@@ -118,7 +118,7 @@ const SelectorLabel = styled(NetworkLabel)`
     display: block;
     margin-right: 8px;
   }
-  width: 125px;
+  white-space: nowrap;
 `
 const SelectorControls = styled.div<{ interactive: boolean }>`
   align-items: center;
