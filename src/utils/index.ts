@@ -3,11 +3,11 @@ import { getAddress } from '@ethersproject/address'
 import { AddressZero } from '@ethersproject/constants'
 import { JsonRpcSigner, Web3Provider } from '@ethersproject/providers'
 import { BigNumber } from '@ethersproject/bignumber'
-import { abi as IPairRouterABI } from '@hybridx-exchange/hybridx-protocol/build/IPairRouter.json'
-import { abi as IOrderBookFactoryABI } from '@hybridx-exchange/hybridx-protocol/build/IOrderBookFactory.json'
-import { abi as IOrderBookRouterABI } from '@hybridx-exchange/hybridx-protocol/build/IOrderBookRouter.json'
+import { abi as IOrderBookFactoryABI } from '@hybridx-exchange/hybridx-protocol/artifacts/contracts/core/orderbook/interfaces/IOrderBookFactory.sol/IOrderBookFactory.json'
+import { abi as IPairRouterABI } from '@hybridx-exchange/hybridx-protocol/artifacts/contracts/periphery/pair/interfaces/IPairRouter.sol/IPairRouter.json'
+import { abi as IOrderBookRouterABI } from '@hybridx-exchange/hybridx-protocol/artifacts/contracts/periphery/orderbook/interfaces/IOrderBookRouter.sol/IOrderBookRouter.json'
+import { abi as IOrderBookABI } from '@hybridx-exchange/hybridx-protocol/artifacts/contracts/core/orderbook/interfaces/IOrderBook.sol/IOrderBook.json'
 import { ORDER_BOOK_ROUTER_ADDRESS, PAIR_ROUTER_ADDRESS } from '../constants'
-import { abi as IOrderBookABI } from '@hybridx-exchange/hybridx-protocol/build/IOrderBook.json'
 import {
   ChainId,
   JSBI,

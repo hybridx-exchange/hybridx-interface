@@ -1,6 +1,6 @@
 import { TokenAmount, Pair, Currency } from '@hybridx-exchange/hybridx-sdk'
 import { useMemo } from 'react'
-import { abi as IPairABI } from '@hybridx-exchange/hybridx-protocol/build/IPair.json'
+import { abi as IPairABI } from '@hybridx-exchange/hybridx-protocol/artifacts/contracts/core/pair/interfaces/IPair.sol/IPair.json'
 import { Interface } from '@ethersproject/abi'
 import { useActiveWeb3React } from '../hooks'
 

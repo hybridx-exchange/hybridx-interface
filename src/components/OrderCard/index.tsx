@@ -77,7 +77,7 @@ export function MinimalOrderCard({ order, border }: OrderCardProps) {
                 {
                   <RowFixed>
                     <Text color="#888D9B" fontSize={16} fontWeight={500} marginLeft={'6px'}>
-                      {order?.amountOffer.toExact() + ' ' + order?.amountOffer.currency.symbol}
+                      {order?.amountOffer.toSignificant() + ' ' + order?.amountOffer.currency.symbol}
                     </Text>
                   </RowFixed>
                 }
@@ -89,7 +89,7 @@ export function MinimalOrderCard({ order, border }: OrderCardProps) {
                 {
                   <RowFixed>
                     <Text color="#888D9B" fontSize={16} fontWeight={500} marginLeft={'6px'}>
-                      {order?.amountLeft.toExact() + ' ' + order?.amountLeft.currency.symbol}
+                      {order?.amountLeft.toSignificant() + ' ' + order?.amountLeft.currency.symbol}
                     </Text>
                   </RowFixed>
                 }
@@ -101,7 +101,7 @@ export function MinimalOrderCard({ order, border }: OrderCardProps) {
                 {
                   <RowFixed>
                     <Text color="#888D9B" fontSize={16} fontWeight={500} marginLeft={'6px'}>
-                      {order?.price.toExact() + ' ' + order?.price.currency.symbol}
+                      {order?.price.toSignificant() + ' ' + order?.price.currency.symbol}
                     </Text>
                   </RowFixed>
                 }
@@ -159,7 +159,7 @@ export default function FullOrderCard({ order, border }: OrderCardProps) {
               {
                 <RowFixed>
                   <Text fontSize={16} fontWeight={500} marginLeft={'6px'}>
-                    {order.amountOffer?.toExact()} {currencyAmount.symbol}:
+                    {order.amountOffer?.toSignificant()} {currencyAmount.symbol}:
                   </Text>
                   <CurrencyLogo size="20px" style={{ marginLeft: '8px' }} currency={currencyAmount} />
                 </RowFixed>
@@ -175,7 +175,7 @@ export default function FullOrderCard({ order, border }: OrderCardProps) {
               {
                 <RowFixed>
                   <Text fontSize={16} fontWeight={500} marginLeft={'6px'}>
-                    {order.amountLeft?.toExact()} {currencyAmount.symbol}:
+                    {order.amountLeft?.toSignificant()} {currencyAmount.symbol}:
                   </Text>
                   <CurrencyLogo size="20px" style={{ marginLeft: '8px' }} currency={currencyAmount} />
                 </RowFixed>
@@ -191,7 +191,7 @@ export default function FullOrderCard({ order, border }: OrderCardProps) {
               {
                 <RowFixed>
                   <Text fontSize={16} fontWeight={500} marginLeft={'6px'}>
-                    {order.price?.toExact()} {currencyQuote.symbol}:
+                    {order.price?.toSignificant()} {currencyQuote.symbol}:
                   </Text>
                   <CurrencyLogo size="20px" style={{ marginLeft: '8px' }} currency={currencyQuote} />
                 </RowFixed>

@@ -82,11 +82,11 @@ export default function TradeModalHeader({
           <TYPE.italic textAlign="left" style={{ width: '100%' }}>
             {`You will received `}
             <b>
-              {trade?.tradeRet?.ammAmountOut.add(trade?.tradeRet?.orderAmountOut).toExact()} {trade?.baseToken.symbol}
+              {trade?.tradeRet?.ammAmountOut.add(trade?.tradeRet?.orderAmountOut).toSignificant()} {trade?.baseToken.symbol}
               {' immediately. '}
             </b>
             {!trade?.tradeRet?.amountLeft.equalTo('0') &&
-              trade?.tradeRet?.amountLeft.toExact() +
+              trade?.tradeRet?.amountLeft.toSignificant() +
                 ' ' +
                 trade?.quoteToken.symbol +
                 ' will be added to the limit buy order of the order book at price of ' +
@@ -98,7 +98,8 @@ export default function TradeModalHeader({
           <TYPE.italic textAlign="left" style={{ width: '100%' }}>
             {`You will received `}
             <b>
-              {trade?.tradeRet?.ammAmountOut.add(trade?.tradeRet?.orderAmountOut).toExact()} {trade?.quoteToken.symbol}
+              {trade?.tradeRet?.ammAmountOut.add(trade?.tradeRet?.orderAmountOut).toSignificant()}{' '}
+              {trade?.quoteToken.symbol}
               {' immediately. '}
             </b>
             {!trade?.tradeRet?.amountLeft.equalTo('0') &&

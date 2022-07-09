@@ -139,7 +139,7 @@ export function OrderBookTable({ orderBook, currencyA, currencyB }: OrderBookTab
         </RowFixed>
         <RowFixed>
           <TYPE.black color={theme.text1} fontSize={14}>
-            {'1 ' + baseSymbol + ' = ' + orderBook?.curPrice.toExact() + ' ' + quoteSymbol}
+            {'1 ' + baseSymbol + ' = ' + orderBook?.curPrice.toSignificant() + ' ' + quoteSymbol}
           </TYPE.black>
         </RowFixed>
       </RowBetween>
