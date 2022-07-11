@@ -5,8 +5,8 @@
   "private": true,
   "devDependencies": {
     "@ethersproject/experimental": "^5.0.1",
-    "@hybridx-exchange/hybridx-protocol": "1.2.0",
-    "@hybridx-exchange/hybridx-sdk": "1.2.1",
+    "@hybridx-exchange/hybridx-protocol": "1.3.0",
+    "@hybridx-exchange/hybridx-sdk": "1.3.0",
     "@hybridx-exchange/token-list": "0.1.0",
     "@popperjs/core": "^2.4.4",
     "@reach/dialog": "^0.10.3",
